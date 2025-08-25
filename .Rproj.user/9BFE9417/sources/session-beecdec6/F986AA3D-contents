@@ -1,0 +1,33 @@
+---
+title: Arraging images in Quarto
+author: Isaac Forzán
+date: 2025-05-30
+categories:
+- quarto
+  - images
+slug: arranging-quarto-images
+page-layout: article
+image: featured.webp
+---
+
+Images can be arranged side by side in Quarto using the \`columns\` layout. Here's how you can do it:
+
+\`\`\`
+::: {#fig-mylabel layout-ncol=2}
+
+\![Caption for figure 1\](featured.webp)
+
+\![Caption for figure 2\](featured.webp)
+
+This is a common caption.
+:::
+\`\`\`
+
+::: {#fig-mylabel layout-ncol=2}
+
+\![Caption for figure 1\](featured.webp)
+
+\![Caption for figure 2\](featured.webp)
+
+This is a common caption.
+:::

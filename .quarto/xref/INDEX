@@ -1,0 +1,14 @@
+{
+  "index.qmd": {
+    "index.html": "ca0b2300"
+  },
+  "about.qmd": {
+    "about.html": "8c1bee36"
+  },
+  "blog/2025-05-30-arranging-quarto-images/index.qmd": {
+    "index.html": "c3de55ab"
+  },
+  "blog/index.qmd": {
+    "index.html": "6ede675f"
+  }
+}

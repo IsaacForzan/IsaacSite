@@ -1,0 +1,44 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Isaac Forzán",
+    "section": "",
+    "text": "This webpage is done with the objective of advertise myself for companies and individuals to make me more hireable — or at least appealing. Think of it as a second resumé; however I would add the prefix anti-resumé because I also seek feedback, discussion, community to get better in my professional career.\nI am really intrested in the world of modelling, biotech, engineering, technology, industry, and in a way philosophy (the fact of doing a mathematical model has many implications about reality itself). I’ll be posting about this topics.\nEmail: isaac_forzan@outlook.com"
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this site\n\n1 + 1\n\n[1] 2"
+  },
+  {
+    "objectID": "index.html#about",
+    "href": "index.html#about",
+    "title": "Isaac Forzán",
+    "section": "",
+    "text": "Hi! This webpage is done with the objective of advertise myself for companies and individuals to make me more hireable — or at least appealing. Think of it as a second resumé; however I would add the prefix anti-resumé because I also seek feedback, discussion, communication to get better in my professional career, given my imperfections."
+  },
+  {
+    "objectID": "index.html#hola",
+    "href": "index.html#hola",
+    "title": "Isaac Forzán",
+    "section": "",
+    "text": "This webpage is done with the objective of advertise myself for companies and individuals to make me more hireable — or at least appealing. Think of it as a second resumé; however I would add the prefix anti-resumé because I also seek feedback, discussion, community to get better in my professional career.\nI am really intrested in the world of modelling, biotech, engineering, technology, industry, and in a way philosophy (the fact of doing a mathematical model has many implications about reality itself). I’ll be posting about this topics.\nEmail: isaac_forzan@outlook.com"
+  },
+  {
+    "objectID": "blog/2025-05-30-arranging-quarto-images/index.html",
+    "href": "blog/2025-05-30-arranging-quarto-images/index.html",
+    "title": "Arraging images in Quarto",
+    "section": "",
+    "text": "Images can be arranged side by side in Quarto using the `columns` layout. Here’s how you can do it:\n``` ::: {#fig-mylabel layout-ncol=2}\n![Caption for figure 1](featured.webp)\n![Caption for figure 2](featured.webp)\nThis is a common caption. ::: ```\n\n\n\n\n\n![Caption for figure 1](featured.webp)\n\n\n![Caption for figure 2](featured.webp)\n\n\n\n\nFigure 1: This is a common caption."
+  },
+  {
+    "objectID": "blog/index.html",
+    "href": "blog/index.html",
+    "title": "Blog",
+    "section": "",
+    "text": "Arraging images in Quarto\n\n\n\n\n\n\nquarto - images\n\n\n\n\n\n\nMay 30, 2025\n\n\n\n\n\n\nNo matching items"
+  }
+]

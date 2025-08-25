@@ -1,0 +1,15 @@
+{
+  "hash": "6a1fba9cad5dbdf6a0e729fb5b2eb652",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\n# yaml options:\ntitle: \"Isaac Forzán\"\nsubtitle: \"Bioengieneer\"\n\nimage: profile.jpg\n---\n\n\n\n\nHi! This is webpage is done with the objective of advertise myself for companies and individuals to make me more hireable. Think of it as a second resumé; however I would add the prefix _*anti*_-resumé \n\n\n\n\n::: {.cell}\n\n```{.r .cell-code}\n1 + 1\n```\n\n::: {.cell-output .cell-output-stdout}\n\n```\n[1] 2\n```\n\n\n:::\n:::\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

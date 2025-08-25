@@ -1,0 +1,18 @@
+---
+# yaml options:
+title: "Isaac Forzán"
+subtitle: "Bioengieneer"
+
+about:
+  template: solana
+  image: a_profile.webp
+  image-shape: round
+  links: 
+    - icon: linkedin
+      text: LinkedIn
+      href: www.linkedin.com/in/risaacforzan
+---
+
+## **Hola!!**
+
+This webpage is done with the objective of advertise myself for companies and individuals to make me more hireable --- or at least appealing. Think of it as a second resumé; however I would add the prefix *anti*-resumé because I also seek feedback, discussion, community to get better in my professional career.
