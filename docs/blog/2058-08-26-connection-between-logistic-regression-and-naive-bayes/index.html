@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Isaac Forzán">
+<meta name="dcterms.date" content="2025-08-26">
+
+<title>Connection Between Naïve Bayes and Logistic Regression – Isaac Forzán</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+<meta property="og:title" content="Connection Between Naïve Bayes and Logistic Regression – Isaac Forzán">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Isaac Forzán">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Isaac Forzán</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../cv.pdf"> 
+<span class="menu-text">CV</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog/index.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#basics" id="toc-basics" class="nav-link" data-scroll-target="#basics">Basics</a>
+  <ul class="collapse">
+  <li><a href="#bayesian-networksbns" id="toc-bayesian-networksbns" class="nav-link" data-scroll-target="#bayesian-networksbns">Bayesian Networks(BNs)</a></li>
+  <li><a href="#markov-networks-mn-a.k.a-markow-random-fields" id="toc-markov-networks-mn-a.k.a-markow-random-fields" class="nav-link" data-scroll-target="#markov-networks-mn-a.k.a-markow-random-fields">Markov Networks (MN) a.k.a Markow Random Fields</a></li>
+  </ul></li>
+  <li><a href="#connection" id="toc-connection" class="nav-link" data-scroll-target="#connection">Connection</a>
+  <ul class="collapse">
+  <li><a href="#am-i-naïve-or-just-stupid" id="toc-am-i-naïve-or-just-stupid" class="nav-link" data-scroll-target="#am-i-naïve-or-just-stupid">Am I naïve or just stupid?</a></li>
+  <li><a href="#conditional-random-fields-crfs" id="toc-conditional-random-fields-crfs" class="nav-link" data-scroll-target="#conditional-random-fields-crfs">Conditional Random Fields (CRFs)</a></li>
+  <li><a href="#playing-with-notation-logistic-regresion" id="toc-playing-with-notation-logistic-regresion" class="nav-link" data-scroll-target="#playing-with-notation-logistic-regresion">Playing with notation &amp; logistic regresion</a></li>
+  </ul></li>
+  <li><a href="#conclusion-or-it-just-feels-the-same" id="toc-conclusion-or-it-just-feels-the-same" class="nav-link" data-scroll-target="#conclusion-or-it-just-feels-the-same">Conclusion or <em>“It just feels the same”</em></a>
+  <ul class="collapse">
+  <li><a href="#p.d.-further-reading" id="toc-p.d.-further-reading" class="nav-link" data-scroll-target="#p.d.-further-reading">P.D. &amp; Further reading</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Connection Between Naïve Bayes and Logistic Regression</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Isaac Forzán </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">August 26, 2025</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>Last year I went crazy and started my statistics rabbit hole; one of the biggest mind blowing experiences was when I was taking a course called “Probabilistic Graphical Models” by Daphne Koller in Coursera and I understood the connection between these two classical modes: logistic regression (LG) and Naïve Bayes (NB). This is a fascinating topic and really you start to dig in about the nature of modelling, and how they resemble to Prague’s Golem; a metaphor taken from Richard McElreath’s book “Statistical Rethinking”, in which he writes <em>“Its abundance of power is matched by its lack of wisdom”</em> <span class="citation" data-cites="mcelreath2020">(<a href="#ref-mcelreath2020" role="doc-biblioref">McElreath 2020</a>)</span>. Hope you enjoy it.</p>
+</section>
+<section id="basics" class="level1">
+<h1>Basics</h1>
+<p>This section is for those who aren’t familiar with Bayesian Networks (BNs) nor Markov Networks (MNs) — so almost everyone. They are fascinating. If you don’t get what MNs are, <em>do not be afraid</em>, it is normal and you shouldn’t be discouraged from finishing all the article. I will keep it brief, I promise ;).</p>
+<section id="bayesian-networksbns" class="level2">
+<h2 class="anchored" data-anchor-id="bayesian-networksbns">Bayesian Networks(BNs)</h2>
+<p>Imagine you are looking for an architect job and start wondering what qualities that companies look for. Your guess is they are looking for some technical drawing skills. So in a way you are saying that to be employed at a architects firm (we will call it <em>EA</em>) <strong>depends</strong> on having good technical drawing skills (<em>DS</em>); in probability we say <span class="math inline">\(EA\)</span> <strong>given</strong> (“|” it expresses dependency) <span class="math inline">\(DS\)</span>, and can be written as:</p>
+<p><span class="math display">\[EA | DS\]</span></p>
+<p>This can be represented as a Graph (<span class="math inline">\(G\)</span>):</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="index_files/figure-html/Fig1-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>This is call “Directed Graph” (in Graph Theory). Look at the direction of the arrow, it will become important later because it represents independency</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>We can write the probability (<span class="math inline">\(P\)</span>) of <span class="math inline">\(AF\)</span> as:</p>
+<p><span class="math display">\[
+P(EA | DS)
+\]</span></p>
+<p>But you start to wonder that they also need candidates with architect-software skills (<em>Sof</em>), so you draw it:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="index_files/figure-html/Fig2-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>Look a the directions of the arrows, we are saying that EmpArch is dependent of that two nodes/variables (DS, Sof) and those two parameters are fully independent – because they do not have any arrow pointing at them. Embrace yourself, next paragraph this comes into play</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Now we say “<span class="math inline">\(EA\)</span> is given by <span class="math inline">\(DS\)</span> and <span class="math inline">\(Sof\)</span>” (<span class="math inline">\(EA | DS, Sof\)</span>). This is great, we have some notion of what to be employed as an architect depends on, this in itself, the <span class="math inline">\(G\)</span> (graph), is a model; however the objective of BNs is to encapsulate the <strong>joint probability distribution</strong> of the model, which is to say that the objective of BNs is to provide the probability of a combination of variables (the correct term is random variables, but right now do not bother differentiating the two terms). In this case the joint probability distribution is written as <span class="math inline">\(P(EA, DS, Sof)\)</span> and is equal to the <em>conditional dependencies</em> (this “<span class="math inline">\(EA | DS\)</span>” is a conditional dependency) of all the variables it depends on, specified by the graph, so:</p>
+<p><span class="math display">\[
+P(EA, DS, Sof) = P(EA | DS, Sof)P(DS)P(Sof)
+\]</span> Note how <span class="math inline">\(DS\)</span> and <span class="math inline">\(Sof\)</span> are fully independent (they do not have a “|”).</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For the probabilistic known reader, we could derive Bayes’ rule from last equation if we want to know the probability of getting an architect job given the <em>X</em> variables</p>
+</div>
+</div>
+<p>But <span class="math inline">\(Sof\)</span> encapsulates many kinds of softwares, like AutoCAD, 3ds Max, … Let’s say there is 3 principal softwares (<span class="math inline">\(S_{1}, S_{2}, S_{3}\)</span>), then the <span class="math inline">\(G\)</span> is modify:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="index_files/figure-html/Fig3-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>Now Sof isn’t independent, and S1, S2, S3 (software programs) are</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>This is the same as the joint probability:</p>
+<p><span class="math display">\[
+P(EA, DS, Sof, S1, S2, S3) = P(EA | DS, Sof)P(DS)P(Sof |S_{1},S_{2}, S_{3})P(S_{1})P(S_{2})P(S_{3})
+\]</span></p>
+<p>We can go on to infinity creating this models, or <span class="math inline">\(G\)</span>, and they can get very tangled, but they are combination of dependencies and independencies. The mathematical representation of <span class="math inline">\(BNs\)</span> for the joint probability distribution is:</p>
+<p><span class="math display">\[
+P(X_{1},...,X_{n}) = \prod_{i=1}^{n}P(x_{i}|Pa_{x_{i}}^{G})
+\]</span></p>
+<p>Where <span class="math inline">\(X_i\)</span> represents the <em>i</em> variable (like Software Skills) and <span class="math inline">\(Pa_{x_{i}}^{G}\)</span> means that it factorizes over the independencies. This equation is also called the <em>chain rule for Bayesian networks</em> – if you don’t know what <span class="math inline">\(\prod\)</span> means, it means the product. Fantastic, BNs are very intuitive, nonetheless they have many algorithmic implications as well as properties that are beyonf the scope of this article.</p>
+</section>
+<section id="markov-networks-mn-a.k.a-markow-random-fields" class="level2">
+<h2 class="anchored" data-anchor-id="markov-networks-mn-a.k.a-markow-random-fields">Markov Networks (MN) a.k.a Markow Random Fields</h2>
+<p>Let’s look first how BNs fail:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="index_files/figure-html/Fig4-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>Ciclic Graph. The meaning of the variables of this example does not matter</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Given this <span class="math inline">\(G\)</span> we know that A is independent of B and B is independent of C and C is independent of A, isn’t it? Well here something odd happens; to see it let’s derive joint probability distribution using the chain rule of BNs:</p>
+<p><span class="math display">\[
+P(A,B,C) = P(B|A)P(C|B)P(A|C) = P(B, C|A) P(A|C)=
+\]</span></p>
+<p><span class="math display">\[
+\longrightarrow P(A,B,C | C) ????
+\]</span> What? Is C dependent on itself? It turns out you can derive the same expression but with A or B at the end, which would incorrectly suggest self-dependence. If we want to represent these kinds of interdependencies we need MNs.</p>
+<p>MNs do not have arrows and the lines that connects the nodes in the <span class="math inline">\(G\)</span> does not represent dependencies/cause, they represent <strong>affinities/factors</strong> between all the nodes (<span class="math inline">\(\phi\)</span>). You can think of them as affinity functions. In this case:</p>
+<p><span class="math display">\[P(A,B,C) \approx \phi(A,B)\phi(A,C)\phi(B,C)\]</span></p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="index_files/figure-html/Fig5-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>In Graph theory the graphs whithout arrows are known as undirected graphs.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The general equation isn’t very friendly: <span class="math display">\[
+P(X) = \frac{1}{Z} \prod_{c\in clique } \phi(c)
+\]</span></p>
+<p>Where <span class="math inline">\(Z\)</span> is known as the partition function, which is just a normalization function (given it reduces the quantities to add up to 1) which equals to:</p>
+<p><span class="math display">\[
+Z= \sum_{c\in clique } \phi(c)
+\]</span></p>
+<p>Abstract stuff. A <em>clique</em> is just the connections of sets (like <span class="math inline">\(A,B,C\)</span>) that encapsulates an area in the <span class="math inline">\(G\)</span>. Last <span class="math inline">\(G\)</span> just have one clique.</p>
+<p>I won’t continue explaining MNs; they do not come natural to our primates brains. Just keep in mind that they just represent affinities.</p>
+</section>
+</section>
+<section id="connection" class="level1">
+<h1>Connection</h1>
+<p>Uff. Hope you still have energy for this section because <strong>this is the good stuff</strong>.</p>
+<section id="am-i-naïve-or-just-stupid" class="level2">
+<h2 class="anchored" data-anchor-id="am-i-naïve-or-just-stupid">Am I naïve or just stupid?</h2>
+<p>Many models are made for prediction, where <span class="math inline">\(Y\)</span> is our predictor and <span class="math inline">\(X\)</span> is our features. In Nïve Bayes (NB) model we have a predictor, often written as <span class="math inline">\(C\)</span>, and a set of <span class="math inline">\(n\)</span> features <span class="math inline">\(X \in (x_{1},..., x_{n})\)</span>. This is the <span class="math inline">\(G\)</span> of NB model:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="index_files/figure-html/Fig6-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>Here we are saying ther is n features for the C predictor. Do you see some resamble to some of the BNs we had worked?</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Can you guess what assumption (like dependencies or independencies) this <span class="math inline">\(G\)</span> makes? (think about it)… This model is saying that in order to predict <span class="math inline">\(C\)</span> we need variables that <em>independent</em> of each other but all dependent on <span class="math inline">\(C\)</span> (In prbability theory independence is written as “<span class="math inline">\(\bot\)</span>”, so here the assumption is written as: <span class="math inline">\((X_{i} \bot X_{j} | C)\)</span>). This is why it is considered <em>naïve</em>; many times <span class="math inline">\(X_i\)</span> and <span class="math inline">\(X_j\)</span> aren’t independent. Imagine the case in which you want to predict happiness of people, you have just two variables: income —just for the sake of the example, although they are correlated—, and health. If you use NB you will not have accurate predictions, because you are assuming that <span class="math inline">\((income \bot health | happiness)\)</span> and this just isn’t the case!! In many countries the income and health are correlated — just look how healthy poor people are in urban areas, and how rich people are.</p>
+<div>
+
+</div>
+<div class="cell quarto-layout-panel" data-layout-ncol="2">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="index_files/figure-html/Fig7-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="index_files/figure-html/Fig7-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>If you know some statistics or casuality, these kinds of issues are more important in inference than in prediction because this arises what statisticians fear the most (suspense)…, confounders. Also, please do not think the naïvity of this model is just exclusive to this model.</p>
+</div>
+</div>
+<p>Before showing the Naïve Bayes model, let’s remember the Chain Rule of BNs: <span class="math display">\[
+P(X_{1},...,X_{n}) = \prod_{i=1}^{n}P(x_{i}|Pa_{x_{i}}^{G})
+\]</span></p>
+<p>Using our NB example of happiness:</p>
+<p><span class="math display">\[
+P(happiness, income, health) =
+\]</span> <span class="math display">\[
+\longrightarrow P(happiness)P(income|happiness)P(health|happiness)
+\]</span> This is the NB mathematical model. Easy, isn’t it? Now this is the generalized form (look how it remarks the assumption <span class="math inline">\((X_{i} \bot X_{j} | C)\)</span>):</p>
+<p><span class="math display">\[
+P(Y, X) = P(Y)\prod_{i=1}^{n}P(x_{i}|Y)
+\]</span></p>
+<p>Now we know why it is naïve, what if I told you we can account for the dependencies of the model (like the dependency <span class="math inline">\(health|rich\)</span>) without ruining the model or makeing it more complex. Behold.</p>
+</section>
+<section id="conditional-random-fields-crfs" class="level2">
+<h2 class="anchored" data-anchor-id="conditional-random-fields-crfs">Conditional Random Fields (CRFs)</h2>
+<p>We want to <strong>condition</strong> <span class="math inline">\(Y\)</span> given <span class="math inline">\(X\)</span>, <span class="math inline">\(P(Y|X)\)</span> so our model can account for all the dependencies — more technically, this means that we aren’t trying to capture the distribution of X, which is important in the NB model because we are estimating <span class="math inline">\(P(x_{i}|Y)\)</span>– this is like not caring about the correlations/dependencies of <span class="math inline">\(X\)</span>.Trust me. This is where CRFs come into play.</p>
+<div class="callout callout-style-simple callout-warning">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p>Many math gibberish coming, but it is necessary</p>
+</div>
+</div>
+</div>
+<p>A CRF is define as a MN, which uses a set of factors (<span class="math inline">\(\Phi = \left\{ \phi_{1}(C_1),...,\phi_{n}(C_n) \right\}\)</span>) (remember that they describe function of affinities, and <span class="math inline">\(C\)</span> is relation of two variables or scope) between variables:</p>
+<p><span class="math display">\[
+\tilde{P}_{\Phi}(X, Y) =  \prod_{i=1 } \phi_{i}(c_{i})
+\]</span> <span class="math inline">\(\tilde{P}_{\Phi}\)</span> is the same probabilities as described in the MNs section but anormalized (without the <span class="math inline">\(\frac{1}{Z}\)</span> term).However <span class="math inline">\(Z\)</span> changes, it just becomes a function of <span class="math inline">\(X\)</span> and sums over <span class="math inline">\(Y\)</span>:</p>
+<p><span class="math display">\[
+Z_{\Phi}(X) = \sum_{Y}\tilde{P}_{\Phi}(X, Y)
+\]</span></p>
+<p>Then:</p>
+<p><span class="math display">\[
+P(Y|X) = \frac{1}{Z_{\Phi}(X)} \tilde{P}_{\Phi}(X, Y)
+\]</span></p>
+<p>This different <span class="math inline">\(Z_{\Phi}(X)\)</span> isn’t just a normalizing constant, now depending on the value of <span class="math inline">\(X\)</span> it will change <span class="math inline">\(Z\)</span> for the <span class="math inline">\(\tilde{P}(X,Y)\)</span>, it is like selection bias (if you are more pro you can think of it as creating a family of distributions given X), this property is what enable us to write the conditional <span class="math inline">\(P(Y|X)\)</span> making us not care about the dependencies of features between the variables <span class="math inline">\(X\)</span>. This is what makes CRF such a powerful tool.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="index_files/figure-html/Fig8-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>Look how similar they are to the NB model, without the arrows. Remember the lines that connect the variables repesents affinities as in MN, BUT, in this case they are conditionally dependent on X given that Z, the normalizing constant, is a function of X, Z(X)</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="playing-with-notation-logistic-regresion" class="level2">
+<h2 class="anchored" data-anchor-id="playing-with-notation-logistic-regresion">Playing with notation &amp; logistic regresion</h2>
+<p>Coming back to the happiness example. Imagine you just have two values for happiness, <span class="math inline">\(Y\)</span> (1 if you are happy, if not 0). Let’s write the logistic regression using an indicator function, <span class="math inline">\(I\)</span> (an indicator function is just a conditional, pretty much like programming; like the happiness variable which takes two values: 1 if happy, 0 if not); with some features, <span class="math inline">\(X_i\)</span> (either income or health).</p>
+<p><span class="math display">\[
+\phi_{i}(X_{i}, Y) = exp\left\{w_{i}I_{\left\{ X_{i} = 1, Y = 1 \right\}}\right\}
+\]</span></p>
+<p>So if <span class="math inline">\(X_i = 1\)</span> and <span class="math inline">\(Y = 1\)</span> then <span class="math inline">\(I\)</span> (the indicator function) takes the value 1; given the term <span class="math inline">\(w_i\)</span> (this kind of terms are usually called <em>weighted terms</em> because they assign some weight, meaning a higher value (imagine you meet the condition and the indicator function takes the value of 1, depending on the <em>weight</em> the whole expression can take a bigger or smaller value; e.g.&nbsp;<span class="math inline">\((w_{1} = 0.5) \neq (w_{2} = 0.7)\)</span> ), depending on <span class="math inline">\(X_i\)</span> — very similar to the term <span class="math inline">\(Z_{\Phi}(X)\)</span> from CRFs, doesn’t it?)</p>
+<p>Now, imagine that we know <span class="math inline">\(Y\)</span>, we have two choices:</p>
+<p><span class="math display">\[
+\phi_{i}(X_{i}, Y = 1) = exp(w_{i}x_{i}) \textbf{  or  } \phi_{i}(X_{i}, Y = 0) = 1
+\]</span></p>
+<p>Since <span class="math inline">\(I\)</span> can either be 1 or 0, and if <span class="math inline">\(I\)</span> is 0 then <span class="math inline">\(exp(0)\)</span> which equals 1, <span class="math inline">\(exp(0) = 1\)</span>. Then we compute the unnormalized density (which in CRFs is the term <span class="math inline">\(\tilde{P_{\Phi}}\)</span> which indicates it has not been normalized by <span class="math inline">\(Z_{\Phi}(X)\)</span> ):</p>
+<p><span class="math display">\[
+\tilde{P_{\Phi}}(X, Y = 1) = exp\left\{ \sum_{i}w_{i}X_{i} \right\} \text{ or } \tilde{P_{\Phi}}(X, Y = 0) = 1
+\]</span></p>
+<p>Now normalized:</p>
+<p><span class="math display">\[
+P_{\Phi}(Y = 1 | X) = \frac{exp\left\{ \sum_{i}w_{i}X_{i} \right\}}{1+exp\left\{ \sum_{i}w_{i}X_{i} \right\}}
+\]</span></p>
+<p>It is a <em>sigmoid function</em> as in logistic regression!!! Which is the same as:</p>
+<p><span class="math display">\[
+\longrightarrow \frac{\tilde{P_{\Phi}}(X, Y = 1)}{\tilde{P_{\Phi}}(X, Y = 0) + \tilde{P_{\Phi}}(X, Y = 1)} = \frac{1}{Z_{\Phi}(X)} \tilde{P}_{\Phi}(X, Y)
+\]</span></p>
+<p>*If you still don’t see it remember that the normalizing value is: <span class="math inline">\(Z_{\Phi}(X) = \sum_{Y}\tilde{P}_{\Phi}(X, Y)\)</span>; the sum of all <span class="math inline">\(\tilde{P_{\Phi}}(X, Y)\)</span> which in this case is a sum over two values.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="index_files/figure-html/Fig9-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>This is just the same expression as the above!!</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>So a logistic regression (LR) is just a <strong>simple</strong> conditional random field (CRF) model!! Wow.</p>
+</section>
+</section>
+<section id="conclusion-or-it-just-feels-the-same" class="level1">
+<h1>Conclusion or <em>“It just feels the same”</em></h1>
+<p>A NB model is the same as an LR but with former just being simple BN and the latter a CRF, which is from the family of MNs. I know this is mind blowing. This connection really helps to grasp what modelling really is like, a tool that help us understand reality but isn’t reality itself.</p>
+<div>
+
+</div>
+<div class="cell quarto-layout-panel" data-layout-ncol="2">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="index_files/figure-html/Fig10-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="index_files/figure-html/Fig10-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+A technical note for the probability junkies — as I am
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The goal in BNs (like NB model) is to compute a joint density and in MNs (like CRF model) is a conditional density; what I mean with <em>density</em> is a probability density function, PDFs (or a mass density function, PMFs, for discrete values) that encapsulates an array of probabilities of an event or parameter (it can be something more abstract for unsupervised methods like Dirichlet or Gaussian models) of <em>n</em> dimensions — I don’t know where I heard it but it’s said that Fisher (a famous frequentist statistician) could grasp what multidimensional models structure mean in his head; btw a hater of bayesianism</p>
+</div>
+</div>
+<section id="p.d.-further-reading" class="level2">
+<h2 class="anchored" data-anchor-id="p.d.-further-reading">P.D. &amp; Further reading</h2>
+<p>I love making the first article of my blog. I hope you liked it. If you want to know about more connections, like hidden markov networks and Linear-chain, I recommend this article see <span class="citation" data-cites="sutton2010">Sutton and McCallum (<a href="#ref-sutton2010" role="doc-biblioref">2010</a>)</span>. This article was heavily based by the excellent book of <span class="citation" data-cites="koller2009">Koller and Friedman (<a href="#ref-koller2009" role="doc-biblioref">2009</a>)</span>, which I am very keen of.</p>
+<p>My adventures in statistics and modelling really have transformed how I see the world and has made me more humble; one of the objectives of this blog is to share some knowledge which is the least I can do. The code for the figures is on GitHub.</p>
+
+
+
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-koller2009" class="csl-entry" role="listitem">
+Koller, Daphne, and Nir Friedman. 2009. <em>Probabilistic Graphical Models: Principles and Techniques</em>. Cambridge, Massachusetts: MIT Press. <a href="http://mcb111.org/w06/KollerFriedman.pdf">http://mcb111.org/w06/KollerFriedman.pdf</a>.
+</div>
+<div id="ref-mcelreath2020" class="csl-entry" role="listitem">
+McElreath, Richard. 2020. <em>Statistical Rethinking: A Bayesian Course with Examples in r and Stan</em>. 2nd ed. Boca Raton, FL: CRC Press.
+</div>
+<div id="ref-sutton2010" class="csl-entry" role="listitem">
+Sutton, Charles, and Andrew McCallum. 2010. <span>“An Introduction to Conditional Random Fields.”</span> <em>arXiv Preprint arXiv:1011.4088</em>. <a href="https://doi.org/10.48550/arXiv.1011.4088">https://doi.org/10.48550/arXiv.1011.4088</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>Made with Quarto</p>
+</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

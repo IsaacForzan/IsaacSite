@@ -10,5 +10,11 @@
   },
   "blog/index.qmd": {
     "index.html": "6ede675f"
+  },
+  "blog/2058-08-26-connection-between-logistic-regression-and-naive-bayes/LogReg-NaiveB.qmd": {
+    "LogReg-NaiveB.html": "20989ac3"
+  },
+  "blog/2058-08-26-connection-between-logistic-regression-and-naive-bayes/index.qmd": {
+    "index.html": "f0d44667"
   }
 }
