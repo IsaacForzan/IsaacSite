@@ -1,6 +1,22 @@
 # RStudio files
 .Rproj.user/
+*.Rproj
 
 # Quarto cache and temporary files
 .quarto/
 _freeze/
+*.aux
+*.log
+*.out
+*.toc
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+
+# Build output (if not using docs/)
+_site/

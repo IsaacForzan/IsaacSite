@@ -3,7 +3,7 @@
     "path": "~/Profesional/Isaac_Web/_quarto.yml",
     "project_path": "_quarto.yml",
     "type": "yaml",
-    "hash": "4083450682",
+    "hash": "0",
     "contents": "",
     "dirty": false,
     "created": 1756153083450.0,
@@ -12,15 +12,15 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "6,33",
+        "cursorPosition": "5,14",
         "scrollLine": "0"
     },
     "folds": "",
-    "lastKnownWriteTime": 1756154760,
+    "lastKnownWriteTime": 1756171029,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1756154760905,
+    "last_content_update": 1756171029279,
     "read_only": false,
     "read_only_alternatives": []
 }
