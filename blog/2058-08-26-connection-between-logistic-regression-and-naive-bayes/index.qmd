@@ -15,7 +15,7 @@ execute:
 
 # Introduction
 
-Last year I went crazy and started my statistics rabbit hole; one of the biggest mind blowing experiences was when I was taking a course called "Probabilistic Graphical Models" by Daphne Koller in Coursera and I understood the connection between these two classical modes: logistic regression (LG) and Naïve Bayes (NB). This is a fascinating topic and really you start to dig in about the nature of modelling, and how they resemble to Prague's Golem; a metaphor taken from Richard McElreath's book "Statistical Rethinking", in which he writes *"Its abundance of power is matched by its lack of wisdom"* [@mcelreath2020]. Hope you enjoy it.
+Last year I went crazy and started my statistics rabbit hole; one of the biggest mind blowing experiences was when I was taking a course called "Probabilistic Graphical Models" by Daphne Koller on Coursera and I understood the connection between these two classical modes: logistic regression (LG) and Naïve Bayes (NB). This is a fascinating topic and really you start to dig in about the nature of modelling, and how they resemble to Prague's Golem; a metaphor taken from Richard McElreath's book "Statistical Rethinking", in which he writes *"Its abundance of power is matched by its lack of wisdom"* [@mcelreath2020]. Hope you enjoy it.
 
 # Basics
 
@@ -23,7 +23,7 @@ This section is for those who aren't familiar with Bayesian Networks (BNs) nor M
 
 ## Bayesian Networks(BNs)
 
-Imagine you are looking for an architect job and start wondering what qualities that companies look for. Your guess is they are looking for some technical drawing skills. So in a way you are saying that to be employed at a architects firm (we will call it *EA*) **depends** on having good technical drawing skills (*DS*); in probability we say $EA$ **given** ("\|" it expresses dependency) $DS$, and can be written as:
+Imagine you are looking for an architect job and start wondering what qualities that companies look for. Your guess is they are looking for some technical drawing skills. So in a way you are saying that to be employed at an architectural firm (we will call it *EA*) **depends** on having good technical drawing skills (*DS*); in probability we say $EA$ **given** ("\|" it expresses dependency) $DS$, and can be written as:
 
 $$EA | DS$$
 
@@ -72,7 +72,7 @@ $$
 Note how $DS$ and $Sof$ are fully independent (they do not have a "|").
 
 ::: callout-note
-For the probabilistic known reader, we could derive Bayes' rule from last equation if we want to know the probability of getting an architect job given the *X* variables
+For the probabilistic known reader, we could derive Bayes' rule from the last equation if we want to know the probability of getting an architect job given the *X* variables
 :::
 
 But $Sof$ encapsulates many kinds of softwares, like AutoCAD, 3ds Max, ... Let's say there is 3 principal softwares ($S_{1}, S_{2}, S_{3}$), then the $G$ is modify:
@@ -106,7 +106,7 @@ $$
 P(X_{1},...,X_{n}) = \prod_{i=1}^{n}P(x_{i}|Pa_{x_{i}}^{G})
 $$ 
 
-Where $X_i$ represents the *i* variable (like Software Skills) and $Pa_{x_{i}}^{G}$ means that it factorizes over the independencies. This equation is also called the *chain rule for Bayesian networks* -- if you don't know what $\prod$ means, it means the product. Fantastic, BNs are very intuitive, nonetheless they have many algorithmic implications as well as properties that are beyonf the scope of this article.
+Where $X_i$ represents the *i* variable (like Software Skills) and $Pa_{x_{i}}^{G}$ means that it factorizes over the independencies. This equation is also called the *chain rule for Bayesian networks* -- if you don't know what $\prod$ means, it means the product. Fantastic, BNs are very intuitive, nonetheless they have many algorithmic implications as well as properties that are beyond the scope of this article.
 
 ## Markov Networks (MN) a.k.a Markow Random Fields
 
@@ -138,9 +138,9 @@ $$
 $$
 \longrightarrow P(A,B,C | C) ????
 $$
-What? Is C dependent on itself? It turns out you can derive the same expression but with A or B at the end,  which would incorrectly suggest self-dependence. If we want to represent these kinds of interdependencies we need MNs.
+What? Is C dependent on itself? It turns out you can derive the same expression but with A or B at the end, which would incorrectly suggest self-dependence. If we want to represent these kinds of interdependencies we need MNs.
 
-MNs do not have arrows and the lines that connects the nodes in the $G$ does not represent dependencies/cause, they represent **affinities/factors** between all the nodes ($\phi$). You can think of them as affinity functions. In this case:
+MNs do not have arrows and the lines that connect the nodes in the $G$ does not represent dependencies/cause, they represent **affinities/factors** between all the nodes ($\phi$). You can think of them as affinity functions. In this case:
 
 $$P(A,B,C) \approx \phi(A,B)\phi(A,C)\phi(B,C)$$
 
@@ -172,7 +172,7 @@ $$
 Z= \sum_{c\in clique } \phi(c)
 $$ 
 
-Abstract stuff. A *clique* is just the connections of sets (like $A,B,C$) that encapsulates an area in the $G$. Last $G$ just have one clique.
+Abstract stuff. A *clique* is just the connections of sets (like $A,B,C$) that encapsulates an area in the $G$. Last $G$ just has one clique.
 
 I won't continue explaining MNs; they do not come natural to our primates brains. Just keep in mind that they just represent affinities.
 
@@ -203,7 +203,7 @@ plot(g6,
 
 ```
 
-Can you guess what assumption (like dependencies or independencies) this $G$ makes? (think about it)... This model is saying that in order to predict $C$ we need variables that *independent* of each other but all dependent on $C$ (In prbability theory independence is written as "$\bot$", so here the assumption is written as: $(X_{i} \bot X_{j} | C)$). This is why it is considered *naïve*; many times $X_i$ and $X_j$ aren't independent. Imagine the case in which you want to predict happiness of people, you have just two variables: income ---just for the sake of the example, although they are correlated---, and health. If you use NB you will not have accurate predictions, because you are assuming that $(income \bot health | happiness)$ and this just isn't the case!! In many countries the income and health are correlated --- just look how healthy poor people are in urban areas, and how rich people are.
+Can you guess what assumption (like dependencies or independencies) this $G$ makes? (think about it)... This model is saying that in order to predict $C$ we need variables that are *independent* of each other but all are dependent on $C$ (In prbability theory independence is written as "$\bot$", so here the assumption is written as: $(X_{i} \bot X_{j} | C)$). This is why it is considered *naïve*; many times $X_i$ and $X_j$ aren't independent. Imagine the case in which you want to predict happiness of people, you have just two variables: income ---just for the sake of the example, although they are correlated---, and health. If you use NB you will not have accurate predictions, because you are assuming that $(income \bot health | happiness)$ and this just isn't the case!! In many countries income and health are correlated --- just look how healthy poor people are in urban areas, and how rich people are.
 
 ```{r}
 #| label: Fig7
@@ -234,7 +234,7 @@ plot(g7.2,
 ```
 
 ::: callout-note
-If you know some statistics or casuality, these kinds of issues are more important in inference than in prediction because this arises what statisticians fear the most (suspense)..., confounders. Also, please do not think the naïvity of this model is just exclusive to this model.
+If you know some statistics or casuality, these kind of issues are more important in inference than in prediction because this arises what statisticians fear the most (suspense)..., confounders. Also, please do not think the naïvity of this model is just exclusive to this model.
 :::
 
 Before showing the Naïve Bayes model, let's remember the Chain Rule of BNs:
@@ -260,18 +260,18 @@ Now we know why it is naïve, what if I told you we can account for the dependen
 
 ## Conditional Random Fields (CRFs)
 
-We want to **condition** $Y$ given $X$, $P(Y|X)$ so our model can account for all the dependencies --- more technically, this means that we aren't trying to capture the distribution of X, which is important in the NB model because we are estimating $P(x_{i}|Y)$-- this is like not caring about the correlations/dependencies of $X$.Trust me. This is where CRFs come into play.
+We want to **condition** $Y$ given $X$, $P(Y|X)$ so our model can account for all the dependencies --- more technically, this means that we aren't trying to capture the distribution of X, which is important in the NB model because we are estimating $P(x_{i}|Y)$-- this is like not caring about the correlations/dependencies of $X$. Trust me. This is where CRFs come into play.
 
 ::: {.callout-warning appearance="simple"}
 Many math gibberish coming, but it is necessary
 :::
 
-A CRF is define as a MN, which uses a set of factors ($\Phi = \left\{ \phi_{1}(C_1),...,\phi_{n}(C_n) \right\}$) (remember that they describe function of affinities, and $C$ is relation of two variables or scope) between variables:
+A CRF is defined as a MN, which uses a set of factors ($\Phi = \left\{ \phi_{1}(C_1),...,\phi_{n}(C_n) \right\}$) (remember that they describe function of affinities, and $C$ is the relation of two variables or scope) between variables:
 
 $$
 \tilde{P}_{\Phi}(X, Y) =  \prod_{i=1 } \phi_{i}(c_{i})
 $$
-$\tilde{P}_{\Phi}$ is the same probabilities as described in the MNs section but anormalized (without the $\frac{1}{Z}$ term).However $Z$ changes, it just becomes a function of $X$ and sums over $Y$:
+$\tilde{P}_{\Phi}$ is the same probabilities as described in the MNs section but anormalized (without the $\frac{1}{Z}$ term). However $Z$ changes, it just becomes a function of $X$ and sums over $Y$:
 
 $$
 Z_{\Phi}(X) = \sum_{Y}\tilde{P}_{\Phi}(X, Y)
@@ -283,7 +283,7 @@ $$
 P(Y|X) = \frac{1}{Z_{\Phi}(X)} \tilde{P}_{\Phi}(X, Y)
 $$ 
 
-This different $Z_{\Phi}(X)$ isn't just a normalizing constant, now depending on the value of $X$ it will change $Z$ for the $\tilde{P}(X,Y)$, it is like selection bias (if you are more pro you can think of it as creating a family of distributions given X), this property is what enable us to write the conditional $P(Y|X)$ making us not care about the dependencies of features between the variables $X$. This is what makes CRF such a powerful tool.
+This different $Z_{\Phi}(X)$ isn't just a normalizing constant, now depending on the value of $X$ it will change $Z$ for the $\tilde{P}(X,Y)$, it is like selection bias (if you are more pro you can think of it as creating a family of distributions given X), this property is what enables us to write the conditional $P(Y|X)$ making us not care about the dependencies of features between the variables $X$. This is what makes CRF such a powerful tool.
 
 ```{r}
 #| label: Fig8
