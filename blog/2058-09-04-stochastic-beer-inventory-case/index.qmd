@@ -1,0 +1,340 @@
+---
+title: "Brewer stochastic inventory modelling. A tutorial for dummies using R"
+format: 
+  html:
+    # Code styling
+    code-fold: true
+    code-summary: "Show code"
+    code-tools: true
+    code-copy: true
+    code-overflow: wrap
+    css: styles.css
+
+code-block-bg: true
+code-block-border-left: "#31BAE9"
+
+
+execute:
+  echo: true       # Show code 
+  warning: false   # Hide warnings
+  message: false   # Hide messages
+  results: true    # Show results (output)
+  output: true     # Show output
+---
+
+# Introduction
+
+Strangely enough, two years ago I was wondering in the college library thinking *"what do quality engineers do?"*; in my mind it's common for me to be wondering that given the nature of my undergraduates degree (biotech engineer). Reading about it I stumbled with terms like Lean Six Sigma, DMAIC, SKUs, KPIs, etc..., but I wasn't compelled because I read a word that make me turned my stomach. ***Gurus***. I couldn't at the time with that word. *"How can a serious book for engineers can follow someone known as a guru"* I thought. I wouldn't have imagine that 2 years from that moment I would be digging in philosophies from this gurus --- being Juran's my favorite.
+
+A big part of quality is **Inventory management**, and that's the topic for my second blog. This is the objective: teach you how to make a simulation of a beer business model for their inventory management using **R + tidyverse**. You cannot be vague nor lie to a computer; so if you program it, you know it.
+
+We will be using the next packages:
+
+```{r}
+#| label: Packages
+library(tidyverse) # for data manipulation, plotting, etc...
+library(gt)        # for better tables
+library(igraph)    # for graphs
+```
+
+# Beer business
+
+Beer companies have 5 principal raw materials that have to order from their suppliers: malt, hops, yeast, bottles, caps. But:
+
+-   When should they order?
+-   How much should they order?
+
+::: {.callout-note appearance="simple"}
+## Where should I order?
+
+This question is also key in inventory management but it is out of the scope of this article.
+:::
+
+This are the questions to ask for their inventory management; if they do not handle it well they will have dead stock, and bad service for their clients. But how can they answer them? There are three variables to keep in mind:
+
+-   The **costs** of the raw materials, $c$
+-   The **demand** of the customers, $d$
+-   The **lead time** for the materials to arrive the warehouse, $L$
+
+The model we will be building is to optimize for these three variables and answer those questions. In order to make a model we have to get some straight rules about the beer business we are simulating, which we will call Dr.House Brewer, we need an **Inventory Policy**, otherwise it will be hell to model it and always order is a good thing for companies.
+
+## Inventory policy: Periodic Review & Order Up-to Level (R, S)
+
+While there is many policies, Dr.House Brewer has a very popperian philosophy and do not trust new innovative policies that promise to increase their ROI by 100%, NO, the company adopts the common *Periodic Review & Order Up-to Level* policy. If you go to Walmart on a specific day of the week to supply yourself from the groceries, you are following Periodic Review & Order Up-to Level policy. It consists in a periodic time space (say every 5 workdays), $R$, when you reorder all your inventory with your suppliers (fixed schedule) and an **up-to level reorder point**, $S$ (you always want to have 10 eggs, you have right now 2, you wait until it is Monday (your reorder time, $R$) to buy your 8 eggs; 10 eggs is your **up-to level reorder point**, $S$). This policy is usually written as $(R,S)$, $R$ for review period and $S$ for up-to level reorder point.
+
+### Simulation time: (R, S) policy in R
+
+We will assume two things:
+
+-   The **demand** of the customers, $d$, is constant/fixed
+-   The **lead time** for the materials to arrive the warehouse, $L$, does NOT exists
+
+These are strong assumptions that are going to be a key point latter in this blog. Lets think of $L = 0$; if there is no lead time, $L$, the moment it it is your reorder time $R$, the moment you get it, this is never the case, but we are going to assume it for the moment.
+
+We need to define the demand, $d$, the time period (in this case daily), $R$ and $S$, so...,
+
+```{r}
+#| label: (R, S) policy-simulation-1
+# Parameters:
+s        <- 14  # order-up-to level (14 units)
+r_period <- 5   # review period (every 5 days)
+demand   <- 2   # constant daily demand
+n_days   <- 24  # number of days to simulate
+ 
+# Initialize vectors for the simulation
+days         <- 1:n_days
+inventory    <- numeric(n_days)  # the storage of the data
+inventory[1] <- s                # Start with order-up-to level
+```
+
+Fantastic, we want a plot of how inventory changes across time using (R, S) policy, so it will be our dependent variable. I'll show you the code, try to understand it, then I'll explain the logic behind it:
+
+```{r}
+#| label: (R, S) policy-simulation-2
+for (i in 1:n_days) {
+  if ((i - 1) %% r_period == 0 && i > 1) { # "%%"-> modulus operation so if 7 %% 3 = 1
+    # Replenish to order-up-to level, s:
+    inventory[i] <- s                 
+  } else if (i > 1){
+    # Carry forward previous day's ending inventory:
+    inventory[i] <- inventory[i - 1]  
+  }
+  
+  # Consume demand at end of the day:
+  inventory[i] <- inventory[i] - demand
+  # print it
+  cat("Day", i, ": Inventory after demand =", inventory[i], "\n")
+}
+```
+
+**Logic:** our inventory array will be decreasing per day given the constant demand, but given that we have a periodic review, $R$, the moment it is $R$-day the moment it replenish your inventory (remember we won't be waiting any time between order and and the suppliers get into our warehouse, there is no **lead time**) to a up-to level reorder point, $S$. We need a for-loop that will help us evaluate whether the inventory per *i* day. A day is composed on mornings and evenings; in the morning we evaluate whether it is $R$-day or not, this is what it does the first condition `(i - 1) %% r_period`; inside the loop:
+
+
+| Day | Evaluation | Result | Note |
+|------|------|------|------|
+|`i = 1`| `(1-1) %% 5` = 0    | `False`    | but we exclude day 1 with `&& i > 1`      |
+|`i = 2`| `(2-1) %% 5` = 1    | `False`      |   -   |
+|`i = 3`| `(3-1) %% 5` = 2    | `False`    |   -   |
+|`.....`|`.....`|`.....`|`.....`|
+|`i = 6`| `(6-1) %% 5` = 0 | `True`     |   equal to 0   |
+
+The next conditional, `else if (i > 1)` , just is saying *"Is this NOT the first day AND NOT a review day?If YES, Start with yesterday's leftover inventory"*. Then by the end of the day we have `inventory[i] - demand` inventory.
+
+::: {.callout-note}
+
+You can make this for-loop a function with `simulate_inventory <- function(s, r_period, demand, n_days)` as parameters, if you want.
+
+:::
+
+```{r}
+#| label: fig-plot1
+#| fig-cap: "(R,S) simulation. Note how it never gets S = 14 [units]; this is given the simulation gives the inventory AFTER the review, or at the end of the day. So after R-day next day in the morning you have 14 but yuu will be consuming 2, given the daily demand, which makes it 12 [units] in the inventory"
+
+# Create a tidy data fram, called tibble
+inventory_data <- tibble(
+  days = days,
+  inventory = inventory
+)
+# Plot the inventory over time
+plot_1 <- inventory_data |> 
+  ggplot(aes(days, inventory)) +
+  geom_line(size = 1, color = "darkblue", linetype = "dashed") +
+  geom_point(size = 2, color = "red") +
+  labs(
+    title = "Inventory Levels Over Time",
+    subtitle = paste("(R,S) Policy: Review every", r_period, "days, Order up to", s, "units"),
+    x = "Days",
+    y = "Inventory Level"
+  ) +
+  scale_x_continuous(breaks = seq(0, n_days, 5)) +
+  theme_bw() +
+  geom_vline(xintercept = seq(5, n_days, r_period), 
+             linetype = "dashed", alpha = 0.5, color = "black") +
+  annotate("text", x = seq(5, n_days, r_period), y = s + 1, 
+           label = "Reorder", size = 3, angle = 90, vjust = -0.5)
+plot_1 
+```
+
+@fig-plot1 shows the plot of inventory vs time. Note how the assumptions affects the simulation: there is an instantaneous replenishment of the inventory level and the inventory level is decreasing uniformly (just an straight line) given constant daily demand. This policy does not show fluctuations in time, but it can be risky because you can get into red levels of inventory level given an unexpected increase of demand and being far from $R$-day (or any given time-period).
+
+Dr.House Brewer has chosen his policy, how can it be optimize?
+
+
+::: {.callout-note}
+
+**Inventory Level** is the net inventory: available on-hand inventory and in-transit inventory, minus backorders, orders not yet shipped, etc.
+
+:::
+
+
+# Supply chains & Inventories
+
+There is three subjects to keep in mind in the supply chain: **suppliers**, **warehouse**, and **customers** (@fig-plot2). The important question for us, the inventory managers from Dr.House Brewery warehouse is to ask: **_ How much should I order?_**. We have policy, but how can me plan it? it turns out this isn't an easy question to respond, because as the population increases, so the costumers, the suppliers and the warehouses and big companies have it tough. That's why we need a model that can help us drive thru this complex chains.
+
+```{r}
+#| label: fig-plot2
+#| fig-cap: "Typical supply chain. Keep in mind there can be n suppliers, warehouses, and customers"
+#| layout: [[10,10, 45]]
+
+
+g1 <- make_graph(~"Suppliers"-+"Warehouse", 
+                 "Warehouse"-+"Customers") # - means line & + means arrow
+
+plot(g1, 
+     layout = layout_as_tree(g1),
+     vertex.color = c("lightblue", "red"),
+     vertex.size = 35,
+     edge.arrow.size = 0.8,
+     vertex.label.cex = 1.2)
+```
+
+
+## Economic Order Quantity (EOQ) model
+
+*How much should I order?* turned out to be depending on the costs!!! --- it is always about money.
+
+$$
+C(Q)
+$$
+
+Where $C$ is cost, and $Q$ is order quantity. There is two types of costs:
+
+
+-   **Holding costs**. Costs associated with storing products. Two types:
+
+  -   **Variable holding costs** (e.g. losses)
+  -   **Fixed holding costs** (e.g. employees)
+  
+-   **Transaction Costs**. All costs associated with ordering the product from the suppliers. Not only transportation. Two types:
+
+  -   **Variable transaction costs** (e.g. packaging)
+  -   **Fixed transaction costs** (e.g. fixed fees)
+
+
+We won't be caring for  **Variable transaction costs** because it does not depend on $Q$ (it depends on the demand, $d$). This is the equation:
+
+$$
+Total Costs = Holding Costs + Transaction Costs
+$$
+
+$$
+\longrightarrow C(Q) = h \frac {Q}{2} + k \frac{D}{Q}
+$$
+
+::: {.callout-note}
+
+## Dimensional Analysis for the engineers out there:
+
+$$
+C(Q) = \left( \frac {[currency]} {[unit]  [time]} * \frac {[item]}{1} \right) +  \left( \frac{[currency]}{[order]} * \frac {[unit]}{[time]} * \frac{1}{[unit]}      \right)
+$$
+
+Since $[order]$ is a count, it is often considered dimensionally equivalent to a pure number, adimensionally. So: 
+
+$$
+C(Q) = \left( \frac {[currency]} {[unit]  [time]} * \frac {[item]}{1} \right) +  \left( \frac{[currency]}{1} * \frac {[unit]}{[time]} * \frac{1}{[unit]}      \right)
+$$
+
+$$
+= \frac{[currency] }{[time]}  +  \frac{[currency] }{[time]}  = \frac{[currency] }{[time]} 
+$$
+
+
+:::
+
+### What does it all mean?
+
+I won't be focusing on the code, for the moment (it is relatively easy this chunk of code), because it isn't really important. What it it is important is understanding EOQ equation ($C(Q)$). So let's focus on the plots: 
+
+```{r}
+#| label: fig-plots
+#| fig-cap: "EOC model"
+#| fig-subcap:
+#|   - "Propotionality"
+#|   - "Inversely proporsional" 
+#|   - "Combine variables"
+#| layout: [[45,-10, 45], [100]]
+# EOC: total cost = holding costs + transactions costs
+h <- 0.2
+k <- 0.5 
+
+eoc_m <- tibble(
+    q = seq(1, 10, 0.1),         # Order quantity
+    h_cost = (h) * (q/2),        # Holding cost
+    t_cost = k * (demand/q),     # Transaction cost
+    total_cost = h_cost + t_cost # Total costs
+  ) 
+
+plot_2 <- eoc_m |> 
+  ggplot(aes(q, h_cost)) +
+  geom_line(color = "darkorange", size = 2) +
+  theme_bw() +
+  labs(
+    title = "Holding cost: (h) * (q/2)",
+    x = "Cost",
+    y = "Order quantity"
+  )
+
+plot_3 <-  eoc_m |> 
+  ggplot(aes(q, t_cost))+
+  geom_line(color = "cyan3", size = 2) +
+  theme_bw() +
+  labs(
+    title = "Transaction costs:  k * (demand/q)",
+    x = "Order quantity",
+    y = "Cost"
+  )
+
+# Make it in long format for the labels in the ggplot
+plot_4 <- eoc_m |> pivot_longer(
+  cols = c(h_cost, t_cost, total_cost), 
+  names_to = "cost_type", 
+  values_to = "cost_value") |> 
+    mutate(cost_type = factor(cost_type, 
+                              levels = c("h_cost", "t_cost", "total_cost"),
+                              labels = c("Holding Cost", "Transaction Cost", "Total Cost"))) |> 
+    ggplot(aes(x = q, y = cost_value, color = cost_type)) +
+    geom_line(size = 1) +
+    scale_color_manual(values = c("Holding Cost" = "darkorange",
+                                  "Transaction Cost" = "cyan3",
+                                  "Total Cost" = "dodgerblue4")) +
+    theme_bw() +
+    labs(
+      x = "Order quantity",
+      y = "Costs",
+      color = "Cost Type:",
+      title = "Economic Order Quantity (EOQ) Cost Analysis"
+    ) +
+    geom_vline(xintercept = c(3, 3.5), 
+               linetype = "dashed", alpha = 0.5, color = "red") +
+    annotate("text", x = 3.3, y = 0.68, color = "red",
+             label = "Optim. Area", size = 3, vjust = -0.5) +
+    theme(legend.position = "bottom")  # Position legend at bottom
+
+plot_2
+plot_3
+plot_4
+ 
+```
+
+Holding costs are easy to undertand (look at @fig-plots-1) as you increase the order quantity, the more you inventory you have, therefore more holding costs. But what about transaction cost (@fig-plots-2); imagine you increase the order of hoops for the brewery, the more you increase the order quantity the less transactions with your supplier, but it has a limit. Combine, the total costs (@fig-plots-3), we can observe that there is minimum, which is point we want to archieve; this minimum is in a big somwhat flat area, this is great for the practioner (us)!, it means that there is room for being wrong and the same time not being so wrong. We can obtain the minimum by deriving total costs function over $Q$. This is the derived equation (we will call it $Q^{*}$, "q-star"):
+
+$$
+\frac{dC }{dQ} = Q^{*}  =  \sqrt[2]{\frac{2kd}{h}}
+$${#eq-qstar}
+
+This means that in order to optimize the order quantity, $Q^*$, you want to avoid the transaction costs by increasing the order quantity, BUT, you don't want to overdo it because by increasing the $Q$, by increasing $k$, you increase the holding costs $h$ (there will just be too many inventory to handle). As much in life, it is a **balance**.
+
+We can replace $Q^{*}$ in @eq-qstar
+
+However all of this is quite far from reality, and that's okay!!! These kinds of models (deterministic models), in my opinion, are not meant to forecast with infinitely precision the phenomena, instead they are meant to make some sense of it and make some intuition, which is often more valuable than doing the model itself. That's why it is worth learning it. 
+
+
+
+
+
+
+
+
+
+
