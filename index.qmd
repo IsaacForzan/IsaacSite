@@ -12,6 +12,9 @@ about:
     - icon: linkedin
       text: LinkedIn
       href: https://www.linkedin.com/in/risaacforzan
+    - icon: github
+      text: GitHub
+      href: https://github.com/IsaacForzan
 ---
 
 ## **Hola!!**
