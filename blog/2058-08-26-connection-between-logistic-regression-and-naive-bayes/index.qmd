@@ -44,7 +44,7 @@ plot(g1,
      vertex.label.cex = 1.2)
 ```
 
-We can write the probability ($P$) of $AF$ as: 
+We can write the probability ($P$) of $AF$ as:
 
 $$
 P(EA | DS)
@@ -68,8 +68,7 @@ Now we say "$EA$ is given by $DS$ and $Sof$" ($EA | DS, Sof$). This is great, we
 
 $$
 P(EA, DS, Sof) = P(EA | DS, Sof)P(DS)P(Sof)
-$$
-Note how $DS$ and $Sof$ are fully independent (they do not have a "|").
+$$ Note how $DS$ and $Sof$ are fully independent (they do not have a "\|").
 
 ::: callout-note
 For the probabilistic known reader, we could derive Bayes' rule from the last equation if we want to know the probability of getting an architect job given the *X* variables
@@ -94,17 +93,17 @@ plot(g3,
      vertex.label.cex = 1.2)
 ```
 
-This is the same as the joint probability: 
+This is the same as the joint probability:
 
 $$
 P(EA, DS, Sof, S1, S2, S3) = P(EA | DS, Sof)P(DS)P(Sof |S_{1},S_{2}, S_{3})P(S_{1})P(S_{2})P(S_{3})
-$$ 
+$$
 
 We can go on to infinity creating this models, or $G$, and they can get very tangled, but they are combination of dependencies and independencies. The mathematical representation of $BNs$ for the joint probability distribution is:
 
 $$
 P(X_{1},...,X_{n}) = \prod_{i=1}^{n}P(x_{i}|Pa_{x_{i}}^{G})
-$$ 
+$$
 
 Where $X_i$ represents the *i* variable (like Software Skills) and $Pa_{x_{i}}^{G}$ means that it factorizes over the independencies. This equation is also called the *chain rule for Bayesian networks* -- if you don't know what $\prod$ means, it means the product. Fantastic, BNs are very intuitive, nonetheless they have many algorithmic implications as well as properties that are beyond the scope of this article.
 
@@ -137,8 +136,7 @@ $$
 
 $$
 \longrightarrow P(A,B,C | C) ????
-$$
-What? Is C dependent on itself? It turns out you can derive the same expression but with A or B at the end, which would incorrectly suggest self-dependence. If we want to represent these kinds of interdependencies we need MNs.
+$$ What? Is C dependent on itself? It turns out you can derive the same expression but with A or B at the end, which would incorrectly suggest self-dependence. If we want to represent these kinds of interdependencies we need MNs.
 
 MNs do not have arrows and the lines that connect the nodes in the $G$ does not represent dependencies/cause, they represent **affinities/factors** between all the nodes ($\phi$). You can think of them as affinity functions. In this case:
 
@@ -161,16 +159,15 @@ plot(g5,
 
 ```
 
-The general equation isn't very friendly: 
-$$
+The general equation isn't very friendly: $$
 P(X) = \frac{1}{Z} \prod_{c\in clique } \phi(c)
-$$ 
+$$
 
 Where $Z$ is known as the partition function, which is just a normalization function (given it reduces the quantities to add up to 1) which equals to:
 
 $$
 Z= \sum_{c\in clique } \phi(c)
-$$ 
+$$
 
 Abstract stuff. A *clique* is just the connections of sets (like $A,B,C$) that encapsulates an area in the $G$. Last $G$ just has one clique.
 
@@ -237,24 +234,21 @@ plot(g7.2,
 If you know some statistics or casuality, these kind of issues are more important in inference than in prediction because this arises what statisticians fear the most (suspense)..., confounders. Also, please do not think the naïvity of this model is just exclusive to this model.
 :::
 
-Before showing the Naïve Bayes model, let's remember the Chain Rule of BNs:
-$$
+Before showing the Naïve Bayes model, let's remember the Chain Rule of BNs: $$
 P(X_{1},...,X_{n}) = \prod_{i=1}^{n}P(x_{i}|Pa_{x_{i}}^{G})
-$$ 
+$$
 
 Using our NB example of happiness:
 
 $$
 P(happiness, income, health) =
-$$ 
-$$
+$$ $$
 \longrightarrow P(happiness)P(income|happiness)P(health|happiness)
-$$ 
-This is the NB mathematical model. Easy, isn't it? Now this is the generalized form (look how it remarks the assumption $(X_{i} \bot X_{j} | C)$):
+$$ This is the NB mathematical model. Easy, isn't it? Now this is the generalized form (look how it remarks the assumption $(X_{i} \bot X_{j} | C)$):
 
 $$
 P(Y, X) = P(Y)\prod_{i=1}^{n}P(x_{i}|Y)
-$$ 
+$$
 
 Now we know why it is naïve, what if I told you we can account for the dependencies of the model (like the dependency $health|rich$) without ruining the model or makeing it more complex. Behold.
 
@@ -270,8 +264,7 @@ A CRF is defined as a MN, which uses a set of factors ($\Phi = \left\{ \phi_{1}(
 
 $$
 \tilde{P}_{\Phi}(X, Y) =  \prod_{i=1 } \phi_{i}(c_{i})
-$$
-$\tilde{P}_{\Phi}$ is the same probabilities as described in the MNs section but anormalized (without the $\frac{1}{Z}$ term). However $Z$ changes, it just becomes a function of $X$ and sums over $Y$:
+$$ $\tilde{P}_{\Phi}$ is the same probabilities as described in the MNs section but anormalized (without the $\frac{1}{Z}$ term). However $Z$ changes, it just becomes a function of $X$ and sums over $Y$:
 
 $$
 Z_{\Phi}(X) = \sum_{Y}\tilde{P}_{\Phi}(X, Y)
@@ -281,7 +274,7 @@ Then:
 
 $$
 P(Y|X) = \frac{1}{Z_{\Phi}(X)} \tilde{P}_{\Phi}(X, Y)
-$$ 
+$$
 
 This different $Z_{\Phi}(X)$ isn't just a normalizing constant, now depending on the value of $X$ it will change $Z$ for the $\tilde{P}(X,Y)$, it is like selection bias (if you are more pro you can think of it as creating a family of distributions given X), this property is what enables us to write the conditional $P(Y|X)$ making us not care about the dependencies of features between the variables $X$. This is what makes CRF such a powerful tool.
 
@@ -315,13 +308,13 @@ Now, imagine that we know $Y$, we have two choices:
 
 $$
 \phi_{i}(X_{i}, Y = 1) = exp(w_{i}x_{i}) \textbf{  or  } \phi_{i}(X_{i}, Y = 0) = 1
-$$ 
+$$
 
 Since $I$ can either be 1 or 0, and if $I$ is 0 then $exp(0)$ which equals 1, $exp(0) = 1$. Then we compute the unnormalized density (which in CRFs is the term $\tilde{P_{\Phi}}$ which indicates it has not been normalized by $Z_{\Phi}(X)$ ):
 
 $$
 \tilde{P_{\Phi}}(X, Y = 1) = exp\left\{ \sum_{i}w_{i}X_{i} \right\} \text{ or } \tilde{P_{\Phi}}(X, Y = 0) = 1
-$$ 
+$$
 
 Now normalized:
 
@@ -333,9 +326,9 @@ It is a *sigmoid function* as in logistic regression!!! Which is the same as:
 
 $$
 \longrightarrow \frac{\tilde{P_{\Phi}}(X, Y = 1)}{\tilde{P_{\Phi}}(X, Y = 0) + \tilde{P_{\Phi}}(X, Y = 1)} = \frac{1}{Z_{\Phi}(X)} \tilde{P}_{\Phi}(X, Y)
-$$  
+$$
 
-*If you still don't see it remember that the normalizing value is: $Z_{\Phi}(X) = \sum_{Y}\tilde{P}_{\Phi}(X, Y)$; the sum of all $\tilde{P_{\Phi}}(X, Y)$ which in this case is a sum over two values.
+\*If you still don't see it remember that the normalizing value is: $Z_{\Phi}(X) = \sum_{Y}\tilde{P}_{\Phi}(X, Y)$; the sum of all $\tilde{P_{\Phi}}(X, Y)$ which in this case is a sum over two values.
 
 ```{r}
 #| label: Fig9

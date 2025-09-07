@@ -225,14 +225,14 @@ window.Quarto = {
 
 <section id="introduction" class="level1">
 <h1>Introduction</h1>
-<p>Last year I went crazy and started my statistics rabbit hole; one of the biggest mind blowing experiences was when I was taking a course called “Probabilistic Graphical Models” by Daphne Koller in Coursera and I understood the connection between these two classical modes: logistic regression (LG) and Naïve Bayes (NB). This is a fascinating topic and really you start to dig in about the nature of modelling, and how they resemble to Prague’s Golem; a metaphor taken from Richard McElreath’s book “Statistical Rethinking”, in which he writes <em>“Its abundance of power is matched by its lack of wisdom”</em> <span class="citation" data-cites="mcelreath2020">(<a href="#ref-mcelreath2020" role="doc-biblioref">McElreath 2020</a>)</span>. Hope you enjoy it.</p>
+<p>Last year I went crazy and started my statistics rabbit hole; one of the biggest mind blowing experiences was when I was taking a course called “Probabilistic Graphical Models” by Daphne Koller on Coursera and I understood the connection between these two classical modes: logistic regression (LG) and Naïve Bayes (NB). This is a fascinating topic and really you start to dig in about the nature of modelling, and how they resemble to Prague’s Golem; a metaphor taken from Richard McElreath’s book “Statistical Rethinking”, in which he writes <em>“Its abundance of power is matched by its lack of wisdom”</em> <span class="citation" data-cites="mcelreath2020">(<a href="#ref-mcelreath2020" role="doc-biblioref">McElreath 2020</a>)</span>. Hope you enjoy it.</p>
 </section>
 <section id="basics" class="level1">
 <h1>Basics</h1>
 <p>This section is for those who aren’t familiar with Bayesian Networks (BNs) nor Markov Networks (MNs) — so almost everyone. They are fascinating. If you don’t get what MNs are, <em>do not be afraid</em>, it is normal and you shouldn’t be discouraged from finishing all the article. I will keep it brief, I promise ;).</p>
 <section id="bayesian-networksbns" class="level2">
 <h2 class="anchored" data-anchor-id="bayesian-networksbns">Bayesian Networks(BNs)</h2>
-<p>Imagine you are looking for an architect job and start wondering what qualities that companies look for. Your guess is they are looking for some technical drawing skills. So in a way you are saying that to be employed at a architects firm (we will call it <em>EA</em>) <strong>depends</strong> on having good technical drawing skills (<em>DS</em>); in probability we say <span class="math inline">\(EA\)</span> <strong>given</strong> (“|” it expresses dependency) <span class="math inline">\(DS\)</span>, and can be written as:</p>
+<p>Imagine you are looking for an architect job and start wondering what qualities that companies look for. Your guess is they are looking for some technical drawing skills. So in a way you are saying that to be employed at an architectural firm (we will call it <em>EA</em>) <strong>depends</strong> on having good technical drawing skills (<em>DS</em>); in probability we say <span class="math inline">\(EA\)</span> <strong>given</strong> (“|” it expresses dependency) <span class="math inline">\(DS\)</span>, and can be written as:</p>
 <p><span class="math display">\[EA | DS\]</span></p>
 <p>This can be represented as a Graph (<span class="math inline">\(G\)</span>):</p>
 <div class="cell">
@@ -274,7 +274,7 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>For the probabilistic known reader, we could derive Bayes’ rule from last equation if we want to know the probability of getting an architect job given the <em>X</em> variables</p>
+<p>For the probabilistic known reader, we could derive Bayes’ rule from the last equation if we want to know the probability of getting an architect job given the <em>X</em> variables</p>
 </div>
 </div>
 <p>But <span class="math inline">\(Sof\)</span> encapsulates many kinds of softwares, like AutoCAD, 3ds Max, … Let’s say there is 3 principal softwares (<span class="math inline">\(S_{1}, S_{2}, S_{3}\)</span>), then the <span class="math inline">\(G\)</span> is modify:</p>
@@ -296,7 +296,7 @@ P(EA, DS, Sof, S1, S2, S3) = P(EA | DS, Sof)P(DS)P(Sof |S_{1},S_{2}, S_{3})P(S_{
 <p><span class="math display">\[
 P(X_{1},...,X_{n}) = \prod_{i=1}^{n}P(x_{i}|Pa_{x_{i}}^{G})
 \]</span></p>
-<p>Where <span class="math inline">\(X_i\)</span> represents the <em>i</em> variable (like Software Skills) and <span class="math inline">\(Pa_{x_{i}}^{G}\)</span> means that it factorizes over the independencies. This equation is also called the <em>chain rule for Bayesian networks</em> – if you don’t know what <span class="math inline">\(\prod\)</span> means, it means the product. Fantastic, BNs are very intuitive, nonetheless they have many algorithmic implications as well as properties that are beyonf the scope of this article.</p>
+<p>Where <span class="math inline">\(X_i\)</span> represents the <em>i</em> variable (like Software Skills) and <span class="math inline">\(Pa_{x_{i}}^{G}\)</span> means that it factorizes over the independencies. This equation is also called the <em>chain rule for Bayesian networks</em> – if you don’t know what <span class="math inline">\(\prod\)</span> means, it means the product. Fantastic, BNs are very intuitive, nonetheless they have many algorithmic implications as well as properties that are beyond the scope of this article.</p>
 </section>
 <section id="markov-networks-mn-a.k.a-markow-random-fields" class="level2">
 <h2 class="anchored" data-anchor-id="markov-networks-mn-a.k.a-markow-random-fields">Markov Networks (MN) a.k.a Markow Random Fields</h2>
@@ -318,7 +318,7 @@ P(A,B,C) = P(B|A)P(C|B)P(A|C) = P(B, C|A) P(A|C)=
 <p><span class="math display">\[
 \longrightarrow P(A,B,C | C) ????
 \]</span> What? Is C dependent on itself? It turns out you can derive the same expression but with A or B at the end, which would incorrectly suggest self-dependence. If we want to represent these kinds of interdependencies we need MNs.</p>
-<p>MNs do not have arrows and the lines that connects the nodes in the <span class="math inline">\(G\)</span> does not represent dependencies/cause, they represent <strong>affinities/factors</strong> between all the nodes (<span class="math inline">\(\phi\)</span>). You can think of them as affinity functions. In this case:</p>
+<p>MNs do not have arrows and the lines that connect the nodes in the <span class="math inline">\(G\)</span> does not represent dependencies/cause, they represent <strong>affinities/factors</strong> between all the nodes (<span class="math inline">\(\phi\)</span>). You can think of them as affinity functions. In this case:</p>
 <p><span class="math display">\[P(A,B,C) \approx \phi(A,B)\phi(A,C)\phi(B,C)\]</span></p>
 <div class="cell">
 <div class="cell-output-display">
@@ -337,7 +337,7 @@ P(X) = \frac{1}{Z} \prod_{c\in clique } \phi(c)
 <p><span class="math display">\[
 Z= \sum_{c\in clique } \phi(c)
 \]</span></p>
-<p>Abstract stuff. A <em>clique</em> is just the connections of sets (like <span class="math inline">\(A,B,C\)</span>) that encapsulates an area in the <span class="math inline">\(G\)</span>. Last <span class="math inline">\(G\)</span> just have one clique.</p>
+<p>Abstract stuff. A <em>clique</em> is just the connections of sets (like <span class="math inline">\(A,B,C\)</span>) that encapsulates an area in the <span class="math inline">\(G\)</span>. Last <span class="math inline">\(G\)</span> just has one clique.</p>
 <p>I won’t continue explaining MNs; they do not come natural to our primates brains. Just keep in mind that they just represent affinities.</p>
 </section>
 </section>
@@ -357,7 +357,7 @@ Z= \sum_{c\in clique } \phi(c)
 </div>
 </div>
 </div>
-<p>Can you guess what assumption (like dependencies or independencies) this <span class="math inline">\(G\)</span> makes? (think about it)… This model is saying that in order to predict <span class="math inline">\(C\)</span> we need variables that <em>independent</em> of each other but all dependent on <span class="math inline">\(C\)</span> (In prbability theory independence is written as “<span class="math inline">\(\bot\)</span>”, so here the assumption is written as: <span class="math inline">\((X_{i} \bot X_{j} | C)\)</span>). This is why it is considered <em>naïve</em>; many times <span class="math inline">\(X_i\)</span> and <span class="math inline">\(X_j\)</span> aren’t independent. Imagine the case in which you want to predict happiness of people, you have just two variables: income —just for the sake of the example, although they are correlated—, and health. If you use NB you will not have accurate predictions, because you are assuming that <span class="math inline">\((income \bot health | happiness)\)</span> and this just isn’t the case!! In many countries the income and health are correlated — just look how healthy poor people are in urban areas, and how rich people are.</p>
+<p>Can you guess what assumption (like dependencies or independencies) this <span class="math inline">\(G\)</span> makes? (think about it)… This model is saying that in order to predict <span class="math inline">\(C\)</span> we need variables that are <em>independent</em> of each other but all are dependent on <span class="math inline">\(C\)</span> (In prbability theory independence is written as “<span class="math inline">\(\bot\)</span>”, so here the assumption is written as: <span class="math inline">\((X_{i} \bot X_{j} | C)\)</span>). This is why it is considered <em>naïve</em>; many times <span class="math inline">\(X_i\)</span> and <span class="math inline">\(X_j\)</span> aren’t independent. Imagine the case in which you want to predict happiness of people, you have just two variables: income —just for the sake of the example, although they are correlated—, and health. If you use NB you will not have accurate predictions, because you are assuming that <span class="math inline">\((income \bot health | happiness)\)</span> and this just isn’t the case!! In many countries income and health are correlated — just look how healthy poor people are in urban areas, and how rich people are.</p>
 <div>
 
 </div>
@@ -381,7 +381,7 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>If you know some statistics or casuality, these kinds of issues are more important in inference than in prediction because this arises what statisticians fear the most (suspense)…, confounders. Also, please do not think the naïvity of this model is just exclusive to this model.</p>
+<p>If you know some statistics or casuality, these kind of issues are more important in inference than in prediction because this arises what statisticians fear the most (suspense)…, confounders. Also, please do not think the naïvity of this model is just exclusive to this model.</p>
 </div>
 </div>
 <p>Before showing the Naïve Bayes model, let’s remember the Chain Rule of BNs: <span class="math display">\[
@@ -400,7 +400,7 @@ P(Y, X) = P(Y)\prod_{i=1}^{n}P(x_{i}|Y)
 </section>
 <section id="conditional-random-fields-crfs" class="level2">
 <h2 class="anchored" data-anchor-id="conditional-random-fields-crfs">Conditional Random Fields (CRFs)</h2>
-<p>We want to <strong>condition</strong> <span class="math inline">\(Y\)</span> given <span class="math inline">\(X\)</span>, <span class="math inline">\(P(Y|X)\)</span> so our model can account for all the dependencies — more technically, this means that we aren’t trying to capture the distribution of X, which is important in the NB model because we are estimating <span class="math inline">\(P(x_{i}|Y)\)</span>– this is like not caring about the correlations/dependencies of <span class="math inline">\(X\)</span>.Trust me. This is where CRFs come into play.</p>
+<p>We want to <strong>condition</strong> <span class="math inline">\(Y\)</span> given <span class="math inline">\(X\)</span>, <span class="math inline">\(P(Y|X)\)</span> so our model can account for all the dependencies — more technically, this means that we aren’t trying to capture the distribution of X, which is important in the NB model because we are estimating <span class="math inline">\(P(x_{i}|Y)\)</span>– this is like not caring about the correlations/dependencies of <span class="math inline">\(X\)</span>. Trust me. This is where CRFs come into play.</p>
 <div class="callout callout-style-simple callout-warning">
 <div class="callout-body d-flex">
 <div class="callout-icon-container">
@@ -411,10 +411,10 @@ P(Y, X) = P(Y)\prod_{i=1}^{n}P(x_{i}|Y)
 </div>
 </div>
 </div>
-<p>A CRF is define as a MN, which uses a set of factors (<span class="math inline">\(\Phi = \left\{ \phi_{1}(C_1),...,\phi_{n}(C_n) \right\}\)</span>) (remember that they describe function of affinities, and <span class="math inline">\(C\)</span> is relation of two variables or scope) between variables:</p>
+<p>A CRF is defined as a MN, which uses a set of factors (<span class="math inline">\(\Phi = \left\{ \phi_{1}(C_1),...,\phi_{n}(C_n) \right\}\)</span>) (remember that they describe function of affinities, and <span class="math inline">\(C\)</span> is the relation of two variables or scope) between variables:</p>
 <p><span class="math display">\[
 \tilde{P}_{\Phi}(X, Y) =  \prod_{i=1 } \phi_{i}(c_{i})
-\]</span> <span class="math inline">\(\tilde{P}_{\Phi}\)</span> is the same probabilities as described in the MNs section but anormalized (without the <span class="math inline">\(\frac{1}{Z}\)</span> term).However <span class="math inline">\(Z\)</span> changes, it just becomes a function of <span class="math inline">\(X\)</span> and sums over <span class="math inline">\(Y\)</span>:</p>
+\]</span> <span class="math inline">\(\tilde{P}_{\Phi}\)</span> is the same probabilities as described in the MNs section but anormalized (without the <span class="math inline">\(\frac{1}{Z}\)</span> term). However <span class="math inline">\(Z\)</span> changes, it just becomes a function of <span class="math inline">\(X\)</span> and sums over <span class="math inline">\(Y\)</span>:</p>
 <p><span class="math display">\[
 Z_{\Phi}(X) = \sum_{Y}\tilde{P}_{\Phi}(X, Y)
 \]</span></p>
@@ -422,7 +422,7 @@ Z_{\Phi}(X) = \sum_{Y}\tilde{P}_{\Phi}(X, Y)
 <p><span class="math display">\[
 P(Y|X) = \frac{1}{Z_{\Phi}(X)} \tilde{P}_{\Phi}(X, Y)
 \]</span></p>
-<p>This different <span class="math inline">\(Z_{\Phi}(X)\)</span> isn’t just a normalizing constant, now depending on the value of <span class="math inline">\(X\)</span> it will change <span class="math inline">\(Z\)</span> for the <span class="math inline">\(\tilde{P}(X,Y)\)</span>, it is like selection bias (if you are more pro you can think of it as creating a family of distributions given X), this property is what enable us to write the conditional <span class="math inline">\(P(Y|X)\)</span> making us not care about the dependencies of features between the variables <span class="math inline">\(X\)</span>. This is what makes CRF such a powerful tool.</p>
+<p>This different <span class="math inline">\(Z_{\Phi}(X)\)</span> isn’t just a normalizing constant, now depending on the value of <span class="math inline">\(X\)</span> it will change <span class="math inline">\(Z\)</span> for the <span class="math inline">\(\tilde{P}(X,Y)\)</span>, it is like selection bias (if you are more pro you can think of it as creating a family of distributions given X), this property is what enables us to write the conditional <span class="math inline">\(P(Y|X)\)</span> making us not care about the dependencies of features between the variables <span class="math inline">\(X\)</span>. This is what makes CRF such a powerful tool.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">

@@ -1,7 +1,7 @@
 ---
 # yaml options:
 title: "Isaac Forzán"
-subtitle: "Bioengieneer"
+subtitle: "Bioengineer"
 
 
 about:
@@ -20,4 +20,4 @@ This webpage is done with the objective of advertise myself for companies and in
 
 I am really intrested in the world of modelling, biotech, engineering, technology, industry, and in a way philosophy (the fact of doing a mathematical model has many implications about reality itself). I'll be posting about this topics.
 
-**Email:** isaac_forzan@outlook.com
+**Email:** isaac_forzan\@outlook.com
