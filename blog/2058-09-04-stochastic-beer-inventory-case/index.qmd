@@ -1,5 +1,5 @@
 ---
-title: "Brewer stochastic inventory modelling. A tutorial for dummies using R"
+title: "Stochastic Inventory Modelling: A Tutorial for Dummies using R"
 format: 
   html:
     # Code styling
@@ -9,7 +9,7 @@ format:
     code-copy: true
     code-overflow: wrap
     css: styles.css
-
+date: 2025-09-09
 code-block-bg: true
 code-block-border-left: "#31BAE9"
 
@@ -24,9 +24,9 @@ execute:
 
 # Introduction
 
-Strangely enough, two years ago I was wondering in the college library thinking *"what do quality engineers do?"*; in my mind it's common for me to be wondering that given the nature of my undergraduates degree (biotech engineer). Reading about it I stumbled with terms like Lean Six Sigma, DMAIC, SKUs, KPIs, etc..., but I wasn't compelled because I read a word that make me turned my stomach. ***Gurus***. I couldn't at the time with that word. *"How can a serious book for engineers can follow someone known as a guru"* I thought. I wouldn't have imagine that 2 years from that moment I would be digging in philosophies from this gurus --- being Juran's my favorite.
+Strangely enough, two years ago I was wandering in the college library thinking *"what do quality engineers do?"*; in my mind it's common for me to be wondering that given the nature of my undergraduate degree (biotech engineer). Reading about it I stumbled with terms like Lean Six Sigma, DMAIC, SKUs, KPIs, etc..., but I wasn't compelled because I read a word that made me turn my stomach. ***Gurus***. I couldn't handle that word at the time. *"How can a serious book for engineers follow someone known as a guru"* I thought. I wouldn't have imagined that 2 years from that moment I would be digging into philosophies from thes gurus --- being Juran's my favorite.
 
-A big part of quality is **Inventory management**, and that's the topic for my second blog. This is the objective: teach you how to make a simulation of a beer business model for their inventory management using **R + tidyverse**. You cannot be vague nor lie to a computer; so if you program it, you know it.
+A big part of quality is **Inventory management**, and that's the topic for my second blog. This is the objective: teach you how to make a simulation of a beer business model for its inventory management using **R + tidyverse**. You cannot be vague nor lie to a computer; so if you program it, you know it.
 
 We will be using the next packages:
 
@@ -37,9 +37,10 @@ library(gt)        # for better tables
 library(igraph)    # for graphs
 ```
 
+
 # Beer business
 
-Beer companies have 5 principal raw materials that have to order from their suppliers: malt, hops, yeast, bottles, caps. But:
+Beer companies have five principal raw materials that tehy have to order from their suppliers: malt, hops, yeast, bottles, and caps. But:
 
 -   When should they order?
 -   How much should they order?
@@ -50,26 +51,26 @@ Beer companies have 5 principal raw materials that have to order from their supp
 This question is also key in inventory management but it is out of the scope of this article.
 :::
 
-This are the questions to ask for their inventory management; if they do not handle it well they will have dead stock, and bad service for their clients. But how can they answer them? There are three variables to keep in mind:
+These are the questions to ask for their inventory management; if they do not handle it well they will have dead stock, and bad service for their clients. But how can they answer them? There are three variables to keep in mind:
 
 -   The **costs** of the raw materials, $c$
 -   The **demand** of the customers, $d$
--   The **lead time** for the materials to arrive the warehouse, $L$
+-   The **lead time** for the materials to arrive at the warehouse, $L$
 
-The model we will be building is to optimize for these three variables and answer those questions. In order to make a model we have to get some straight rules about the beer business we are simulating, which we will call Dr.House Brewer, we need an **Inventory Policy**, otherwise it will be hell to model it and always order is a good thing for companies.
+The model we will be building is to optimize for these three variables and answer those questions. In order to make a model we have to get some straight rules about the beer business we are simulating, which we will call Dr.House Brewer, we need an **Inventory Policy**, otherwise it will be hell to model it. Always some order is a good thing for companies.
 
 ## Inventory policy: Periodic Review & Order Up-to Level (R, S)
 
-While there is many policies, Dr.House Brewer has a very popperian philosophy and do not trust new innovative policies that promise to increase their ROI by 100%, NO, the company adopts the common *Periodic Review & Order Up-to Level* policy. If you go to Walmart on a specific day of the week to supply yourself from the groceries, you are following Periodic Review & Order Up-to Level policy. It consists in a periodic time space (say every 5 workdays), $R$, when you reorder all your inventory with your suppliers (fixed schedule) and an **up-to level reorder point**, $S$ (you always want to have 10 eggs, you have right now 2, you wait until it is Monday (your reorder time, $R$) to buy your 8 eggs; 10 eggs is your **up-to level reorder point**, $S$). This policy is usually written as $(R,S)$, $R$ for review period and $S$ for up-to level reorder point.
+While there are many policies, Dr.House Brewer has a very popperian philosophy and does not trust new innovative policies that promise to increase its ROI by 100%, NO, the company adopts the common *Periodic Review & Order Up-to Level* policy. If you go to Walmart on a specific day of the week to stock up on groceries, you are following Periodic Review & Order Up-to Level policy. It consists of a periodic time interval (say every 5 workdays), $R$, when you reorder all your inventory with your suppliers (fixed schedule) and an **up-to level reorder point**, $S$ (you always want to have 10 eggs, you have right now 2, you wait until it is Monday (your reorder time, $R$) to buy your 8 eggs; 10 eggs is your **up-to level reorder point**, $S$). This policy is usually written as $(R,S)$, $R$ for review period and $S$ for up-to level reorder point.
 
 ### Simulation time: (R, S) policy in R
 
 We will assume two things:
 
 -   The **demand** of the customers, $d$, is constant/fixed
--   The **lead time** for the materials to arrive the warehouse, $L$, does NOT exists
+-   The **lead time** for the materials to arrive at the warehouse, $L$, does NOT exist
 
-These are strong assumptions that are going to be a key point latter in this blog. Lets think of $L = 0$; if there is no lead time, $L$, the moment it it is your reorder time $R$, the moment you get it, this is never the case, but we are going to assume it for the moment.
+These are strong assumptions that are going to be a key point latter in this blog. Lets think of $L = 0$; if there is no lead time, $L$, the moment it is your reorder time $R$, thet is the moment you get it. This is never the case, but we are going to assume it for the moment.
 
 We need to define the demand, $d$, the time period (in this case daily), $R$ and $S$, so...,
 
@@ -87,7 +88,7 @@ inventory    <- numeric(n_days)  # the storage of the data
 inventory[1] <- s                # Start with order-up-to level
 ```
 
-Fantastic, we want a plot of how inventory changes across time using (R, S) policy, so it will be our dependent variable. I'll show you the code, try to understand it, then I'll explain the logic behind it:
+Fantastic, we want a plot of how inventory changes over time using the (R, S) policy, so it will be our dependent variable. I'll show you the code, try to understand it, then I'll explain the logic behind it:
 
 ```{r}
 #| label: (R, S) policy-simulation-2
@@ -107,28 +108,25 @@ for (i in 1:n_days) {
 }
 ```
 
-**Logic:** our inventory array will be decreasing per day given the constant demand, but given that we have a periodic review, $R$, the moment it is $R$-day the moment it replenish your inventory (remember we won't be waiting any time between order and and the suppliers get into our warehouse, there is no **lead time**) to a up-to level reorder point, $S$. We need a for-loop that will help us evaluate whether the inventory per *i* day. A day is composed on mornings and evenings; in the morning we evaluate whether it is $R$-day or not, this is what it does the first condition `(i - 1) %% r_period`; inside the loop:
+**Logic:** our inventory array will be decreasing per day given the constant demand, but given that we have a periodic review, $R$, the moment it is $R$-day the moment it replenishes your inventory (remember we won't be waiting any time between order and the supplies arriving at the warehouse, there is no **lead time**) to an up-to level reorder point, $S$. We need a for-loop that will help us evaluate whether the inventory per *i* day. A day is composed of mornings and evenings; in the morning we evaluate whether it is $R$-day or not, this is whatthe first condition does `(i - 1) %% r_period`; inside the loop:
 
+| Day     | Evaluation       | Result  | Note                                 |
+|---------|------------------|---------|--------------------------------------|
+| `i = 1` | `(1-1) %% 5` = 0 | `False` | but we exclude day 1 with `&& i > 1` |
+| `i = 2` | `(2-1) %% 5` = 1 | `False` | \-                                   |
+| `i = 3` | `(3-1) %% 5` = 2 | `False` | \-                                   |
+| `.....` | `.....`          | `.....` | `.....`                              |
+| `i = 6` | `(6-1) %% 5` = 0 | `True`  | equal to 0                           |
 
-| Day | Evaluation | Result | Note |
-|------|------|------|------|
-|`i = 1`| `(1-1) %% 5` = 0    | `False`    | but we exclude day 1 with `&& i > 1`      |
-|`i = 2`| `(2-1) %% 5` = 1    | `False`      |   -   |
-|`i = 3`| `(3-1) %% 5` = 2    | `False`    |   -   |
-|`.....`|`.....`|`.....`|`.....`|
-|`i = 6`| `(6-1) %% 5` = 0 | `True`     |   equal to 0   |
+The next conditional, `else if (i > 1)` , is just  saying *"Is this NOT the first day AND NOT a review day? If YES, start with yesterday's leftover inventory"*. Then by the end of the day we have `inventory[i] - demand` inventory.
 
-The next conditional, `else if (i > 1)` , just is saying *"Is this NOT the first day AND NOT a review day?If YES, Start with yesterday's leftover inventory"*. Then by the end of the day we have `inventory[i] - demand` inventory.
-
-::: {.callout-note}
-
+::: callout-note
 You can make this for-loop a function with `simulate_inventory <- function(s, r_period, demand, n_days)` as parameters, if you want.
-
 :::
 
 ```{r}
 #| label: fig-plot1
-#| fig-cap: "(R,S) simulation. Note how it never gets S = 14 [units]; this is given the simulation gives the inventory AFTER the review, or at the end of the day. So after R-day next day in the morning you have 14 but yuu will be consuming 2, given the daily demand, which makes it 12 [units] in the inventory"
+#| fig-cap: "(R,S) simulation. Note how it never gets S = 14 [units]; because the simulation gives the inventory AFTER the review, or at the end of the day. So after R-day next day in the morning you have 14 but you will be consuming 2, given the daily demand, which makes it 12 [units] in the inventory"
 
 # Create a tidy data fram, called tibble
 inventory_data <- tibble(
@@ -155,26 +153,22 @@ plot_1 <- inventory_data |>
 plot_1 
 ```
 
-@fig-plot1 shows the plot of inventory vs time. Note how the assumptions affects the simulation: there is an instantaneous replenishment of the inventory level and the inventory level is decreasing uniformly (just an straight line) given constant daily demand. This policy does not show fluctuations in time, but it can be risky because you can get into red levels of inventory level given an unexpected increase of demand and being far from $R$-day (or any given time-period).
+@fig-plot1 shows the plot of inventory vs time. Note how the assumptions affect the simulation: there is an instantaneous replenishment of the inventory level and the inventory level is decreasing uniformly (just a straight line) given constant daily demand. This policy does not show fluctuations in time, but it can be risky because you can get into red levels of inventory level given an unexpected increase in demand and being far from $R$-day (or any given time-period).
 
-Dr.House Brewer has chosen his policy, how can it be optimize?
+Dr.House Brewer has chosen hits policy, how can it be optimized?
 
-
-::: {.callout-note}
-
+::: callout-note
 **Inventory Level** is the net inventory: available on-hand inventory and in-transit inventory, minus backorders, orders not yet shipped, etc.
-
 :::
-
 
 # Supply chains & Inventories
 
-There is three subjects to keep in mind in the supply chain: **suppliers**, **warehouse**, and **customers** (@fig-plot2). The important question for us, the inventory managers from Dr.House Brewery warehouse is to ask: **_ How much should I order?_**. We have policy, but how can me plan it? it turns out this isn't an easy question to respond, because as the population increases, so the costumers, the suppliers and the warehouses and big companies have it tough. That's why we need a model that can help us drive thru this complex chains.
+There are three topics to keep in mind in the supply chain: suppliers, warehouse, and customers (@fig-plot2). The important question for us, the inventory managers at Dr.House Brewery warehouse, is to ask: **_ How much should I order?_**. We have a policy, but how can we plan it? It turns out this isn't an easy question to answer, because as the population increases, so do the customers, the suppliers and the warehouses, and big companies have it tough. That's why we need a model that can help us navigate this complex supply chains.
 
 ```{r}
 #| label: fig-plot2
 #| fig-cap: "Typical supply chain. Keep in mind there can be n suppliers, warehouses, and customers"
-#| layout: [[10,10, 45]]
+
 
 
 g1 <- make_graph(~"Suppliers"-+"Warehouse", 
@@ -188,7 +182,6 @@ plot(g1,
      vertex.label.cex = 1.2)
 ```
 
-
 ## Economic Order Quantity (EOQ) model
 
 *How much should I order?* turned out to be depending on the costs!!! --- it is always about money.
@@ -199,19 +192,19 @@ $$
 
 Where $C$ is cost, and $Q$ is order quantity. There is two types of costs:
 
-
 -   **Holding costs**. Costs associated with storing products. Two types:
 
-  -   **Variable holding costs** (e.g. losses)
-  -   **Fixed holding costs** (e.g. employees)
-  
+-   **Variable holding costs** (e.g. losses)
+
+-   **Fixed holding costs** (e.g. employees)
+
 -   **Transaction Costs**. All costs associated with ordering the product from the suppliers. Not only transportation. Two types:
 
-  -   **Variable transaction costs** (e.g. packaging)
-  -   **Fixed transaction costs** (e.g. fixed fees)
+-   **Variable transaction costs** (e.g. packaging)
 
+-   **Fixed transaction costs** (e.g. fixed fees)
 
-We won't be caring for  **Variable transaction costs** because it does not depend on $Q$ (it depends on the demand, $d$). This is the equation:
+We won't be caring for **Variable transaction costs** because they do not depend on $Q$ (they depend on the demand, $d$). This is the equation:
 
 $$
 Total Costs = Holding Costs + Transaction Costs
@@ -221,15 +214,14 @@ $$
 \longrightarrow C(Q) = h \frac {Q}{2} + k \frac{D}{Q}
 $$
 
-::: {.callout-note}
-
+::: callout-note
 ## Dimensional Analysis for the engineers out there:
 
 $$
 C(Q) = \left( \frac {[currency]} {[unit]  [time]} * \frac {[item]}{1} \right) +  \left( \frac{[currency]}{[order]} * \frac {[unit]}{[time]} * \frac{1}{[unit]}      \right)
 $$
 
-Since $[order]$ is a count, it is often considered dimensionally equivalent to a pure number, adimensionally. So: 
+Since $[order]$ is a count, it is often considered dimensionally equivalent to a pure number, adimensionally. So:
 
 $$
 C(Q) = \left( \frac {[currency]} {[unit]  [time]} * \frac {[item]}{1} \right) +  \left( \frac{[currency]}{1} * \frac {[unit]}{[time]} * \frac{1}{[unit]}      \right)
@@ -238,23 +230,21 @@ $$
 $$
 = \frac{[currency] }{[time]}  +  \frac{[currency] }{[time]}  = \frac{[currency] }{[time]} 
 $$
-
-
 :::
 
 ### What does it all mean?
 
-I won't be focusing on the code, for the moment (it is relatively easy this chunk of code), because it isn't really important. What it it is important is understanding EOQ equation ($C(Q)$). So let's focus on the plots: 
+I won't be focusing on the code, for the moment (it is relatively easy this chunk of code), because it isn't really important. What is important is understanding the EOQ equation ($C(Q)$). So let's focus on the plots:
 
 ```{r}
 #| label: fig-plots
-#| fig-cap: "EOC model"
+#| fig-cap: "EOQ model"
 #| fig-subcap:
 #|   - "Propotionality"
 #|   - "Inversely proporsional" 
 #|   - "Combine variables"
 #| layout: [[45,-10, 45], [100]]
-# EOC: total cost = holding costs + transactions costs
+# EOQ: total cost = holding costs + transactions costs
 h <- 0.2
 k <- 0.5 
 
@@ -317,24 +307,834 @@ plot_4
  
 ```
 
-Holding costs are easy to undertand (look at @fig-plots-1) as you increase the order quantity, the more you inventory you have, therefore more holding costs. But what about transaction cost (@fig-plots-2); imagine you increase the order of hoops for the brewery, the more you increase the order quantity the less transactions with your supplier, but it has a limit. Combine, the total costs (@fig-plots-3), we can observe that there is minimum, which is point we want to archieve; this minimum is in a big somwhat flat area, this is great for the practioner (us)!, it means that there is room for being wrong and the same time not being so wrong. We can obtain the minimum by deriving total costs function over $Q$. This is the derived equation (we will call it $Q^{*}$, "q-star"):
+Holding costs are easy to understand (look at @fig-plots-1) as you increase the order quantity, the more you inventory you have, therefore more holding costs. But what about transaction cost (@fig-plots-2); imagine you increase the order of hoops for the brewery, the more you increase the order quantity the less transactions with your supplier, but it has a limit. Combine, the total costs (@fig-plots-3), we can observe that there is minimum, which is point we want to archieve; this minimum is in a big somwhat flat area, this is great for the practioner (us)!, it means that there is room for being wrong and the same time not being so wrong. We can obtain the minimum by deriving total costs function over $Q$. This is the derived equation (we will call it $Q^{*}$, "q-star"):
 
 $$
 \frac{dC }{dQ} = Q^{*}  =  \sqrt[2]{\frac{2kd}{h}}
-$${#eq-qstar}
+$$ {#eq-qstar}
 
-This means that in order to optimize the order quantity, $Q^*$, you want to avoid the transaction costs by increasing the order quantity, BUT, you don't want to overdo it because by increasing the $Q$, by increasing $k$, you increase the holding costs $h$ (there will just be too many inventory to handle). As much in life, it is a **balance**.
+This means that in order to optimize the order quantity, $Q^*$, you want to avoid the transaction costs by increasing the order quantity, BUT, you don't want to overdo it because by increasing the $Q$, you increase the holding costs $h$ (there will just be too many inventory to handle). As with much in life, it is a **balance**.
 
-We can replace $Q^{*}$ in @eq-qstar
+We can replace $Q^{*}$ in @eq-qstar to find the minimum cost --- we won't do it though.
 
-However all of this is quite far from reality, and that's okay!!! These kinds of models (deterministic models), in my opinion, are not meant to forecast with infinitely precision the phenomena, instead they are meant to make some sense of it and make some intuition, which is often more valuable than doing the model itself. That's why it is worth learning it. 
-
-
+However, all of this is quite far from reality, and that's okay!!! These kinds of models (deterministic models), in my opinion, are not meant to forecast with infinite precision the phenomena; instead they are meant to make some sense of it and build some intuition, which is often more valuable than doing the model itself. That's why it is worth learning them.
 
 
+# Stochastic modelling or _A number isn't just a number_
+
+Here are the assumptions we have made so far:
+
+- The **demand**, $d$, is constant
+- There is no **lead time**, $l$, (the waiting time for the supplies to arrive since the order is made)
+
+They are strong assumptions because in reality the demand is variable, and there is lead time which is also variable. 
+We are going to incorporate these assumptions into the model, making it stochastic. Stochastic is just another word for randomness, and a stochastic model is just the incorporation of random variables (in this case $d$, and $l$) to the model. Why? It helps us deal with uncertainty.
+
+e.g. Imagine we want to estimate how much should we order. We use the derived $Q*$ to make an estimate, but that estimate can be interpreted as an average of a normal distribution; if we use it we are saying there is still a 50% cumulative probability that there will not be enough **on-hand** inventory to cover the demand. No good news. In other words, you are gambling that you will have enough on-hand inventory by tossing a coin. This scenario is too risky but that risk can be manageable by taking into account in the model the same uncertainty. Rephrasing: Stochastic models help us make decisions under uncertainty. We will still be making plenty of assumptions but at least this model is more fit for real-case scenarios
+
+## The normal distribution plus words of caution
+
+We will be assuming that **demand**, $d$, and **lead time**, $l$, have a normal distribution. Therefore we have to know what the normal distribution is saying. If you know what a PDF, CDF, and quantiles are, you can skip this part.
+
+### Hyperparameters
+
+Here is a controversial opinion, I do not like the Normal distribution. I am done, I said it. It just tells there is an expected value, the mean $\mu$,  and perturbations around it, the standard deviation $\sigma^2$. That phrasing can be applied to every single stuff, and I am very cautious when the universality principle can be applied, also in a way you are expressing ignorance because if you only know that there is perturbations around a mean, you don't know if that how that perturbations are behaving, which is the idea, capture that uncertainty of the phenomena. Having said that, normal distributions are very helpful to make estimates despite its universality --- also they are wildly use because of the central limit theorem which ultimately says that every phenomena will behave as a normal distribution as data is gathered to infinite. So assuming normality for **demand**, $d$, and **lead time**, $l$ variables:
+
+$$
+d \sim N(\mu_{d}, \sigma_{d}^{2})
+$$
+
+$$
+l\sim N(\mu_{l}, \sigma_{l}^{2})
+$$
+
+We can read the last equations as "demand and lead time follows a normal distribution of with **hyperparameters** mean $\mu_x$ and standard deviation $\sigma^{2}_{x}$". We will only care for the hyperparameters, nothing else, just to make it simple and not dealing with a lot of algebra, also because we can describe this distribution just with these hyperparameters, like in @fig-plot3.
+
+```{r}
+#| label: fig-plot3
+#| fig-cap: "Three normal distributions"
+
+# Computing the normal distribution
+x_norm <- tibble(
+  x = seq(-6, 6, 0.01),
+  norm1 = dnorm(x, mean = 0, sd = 1), # this is called the "standard" normal distribution
+  norm2 = dnorm(x, mean = 0, sd = 3),
+  norm3 = dnorm(x, mean = 3, sd = 1)
+  # Look how we just modify the the hyperparameters
+)
+
+plot_5 <- x_norm |> 
+  ggplot(aes(x = x)) +
+  geom_line(aes(y = norm1), color = "blue", size = 1) +
+  geom_line(aes(y = norm2), color = "red", size = 1) +
+  geom_line(aes(y = norm3), color = "green", size = 1) +
+  labs(
+    title = "Normal distributions",
+    y = "Density",
+    x = "Probability"
+  ) +
+  theme_bw()
+
+plot_5
 
 
 
+```
+
+### PDF & CDF
+
+The normal distribution is a Probability _Density_ Function (PDF). That word, density, is important because it tell us that a normal distribution can take a continuous array of values; if we are saying that demand follows a normal distribution we are sayinf that it can take continuous values. This is not the case: "please give me 2.12419 kegs of beer", that does not make sense. This is another assumption that we are explicitly making. 
+
+Another important subject is a Cumulative Density Functions (CDFs). Every PDF has its CDF. They are just the accumulative probability of of its relative PDF. @fig-plot4 shows both a PDF and CDF of a standardized normal distribution, $X \sim N(\mu = 0, \sigma^2 = 1)$. CDFs are important because they help access the risk of choosing a value within our normal distribution, or any PDF.
+
+```{r}
+#| label: fig-plot4
+#| fig-cap: "Normal PDF and CDF. Look how the mean is half of the CDF, so it's saying that you capture half the probability of any given event that follows a normal PDF"
+
+# Create data for both PDF and CDF
+df_combined <- tibble(
+  x = seq(-4, 4, 0.01),
+  pdf = dnorm(x),
+  cdf = pnorm(x)
+)
+
+
+plot_6 <- ggplot(df_combined, aes(x = x)) +
+  geom_line(aes(y = pdf, color = "PDF"), linewidth = 1) +
+  geom_line(aes(y = cdf * max(pdf), color = "CDF"), linewidth = 1) +
+  scale_y_continuous(
+    name = "Probability Density (PDF)",
+    sec.axis = sec_axis(~./max(df_combined$pdf), 
+                       name = "Cumulative Probability (CDF)",
+                       labels = scales::percent)
+  ) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "red") +
+  scale_color_manual(values = c("PDF" = "steelblue", "CDF" = "orange")) +
+  labs(title = "Standard Normal Distribution: PDF and CDF",
+       x = "Standard Deviations from Mean",
+       color = "Function") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.position = "bottom",
+    axis.title.y.right = element_text(color = "orange"),
+    axis.text.y.right = element_text(color = "orange")
+  )
+
+plot_6
+```
+
+### Quantiles & normal rule of thumb
+
+There is another property of big importance. While CDFs describe the cumulative probability of a PDF within a range of values, quantiles describe specific points that divide the range of a PDF into equal probabilities. In a normal PDF there is a rule of thumb called *68–95–99.7 rule*, which says that in the quantile $\pm 1\sigma$ we capture 68% of probabilities of any normal distribution, in $\pm 2\sigma$ 95% and $\pm 3\sigma$ 99.7%.
+
+```{r}
+#| label: fig-plot5
+#| fig-cap: "68–95–99.7 rule. Notice how the quantiles divide the normal distribution in equal length."
+
+
+# Create data for standard normal distribution
+df <- tibble(x = seq(-4, 4, length.out = 1000), y = dnorm(x))
+
+# Create the first plot with empirical rule
+plot_7 <- ggplot(df, aes(x = x, y = y)) +
+  geom_line(linewidth = 1, color = "black") +
+  
+  # Add shaded regions for empirical rule
+  geom_area(data = df %>% filter(x >= -1 & x <= 1), 
+            aes(x = x, y = y), fill = "lightblue", alpha = 0.5) +
+  geom_area(data = df %>% filter(x >= -2 & x <= 2), 
+            aes(x = x, y = y), fill = "lightgreen", alpha = 0.3) +
+  geom_area(data = df %>% filter(x >= -3 & x <= 3), 
+            aes(x = x, y = y), fill = "lightpink", alpha = 0.2) +
+  
+  # Add vertical lines for mean and standard deviations
+  geom_vline(xintercept = 0, linetype = "solid", color = "red", linewidth = 1) +
+  geom_vline(xintercept = c(-1, 1), linetype = "dashed", color = "blue") +
+  geom_vline(xintercept = c(-2, 2), linetype = "dashed", color = "green") +
+  geom_vline(xintercept = c(-3, 3), linetype = "dashed", color = "purple") +
+  
+  # Add annotations
+  annotate("text", x = 0, y = 0.1, label = "Mean (μ = 0)", 
+           color = "red", vjust = -1) +
+  annotate("text", x = 0, y = 0.3, label = "68% within ±1σ", 
+           color = "blue", size = 3) +
+  annotate("text", x = 1.5, y = 0.25, label = "95% within ±2σ", 
+           color = "green", size = 3) +
+  annotate("text", x = 2.5, y = 0.2, label = "99.7% within ±3σ", 
+           color = "purple", size = 3) +
+  
+  # Customize theme and labels
+  labs(title = "Standard Normal Distribution with quantiles",
+       subtitle = "68-95-99.7 Rule (One, Two, Three Standard Deviations)",
+       x = "Standard Deviations from Mean", 
+       y = "Density") +
+  theme_bw() 
+
+
+plot_7
+```
+
+
+If you think a quantile is just another way of describing a CDF, you are not alone, it is a common misconception. They are closely related and this relationship will become important. While a CDF function, $F(x)$, computes the cumulative range of probabilities, $p$, that are bigger or equal of $x$, $P(X \le  x) = F(x) = p$; a quantile function computes the value, $x$, to obtain a range of probabilities $p$. In other words a quantile function is the inverse of the CDF function, $F^{-1}(p) = x$. This is the explicit relationship:
+
+$$
+F(x) = p  \quad \leftrightharpoons  \quad F^{-1}(p) = x
+$${#eq-inversecdf}
+
+## Stochastic EOQ model
+
+The objective in transforming the EOQ model into a stochastic model is to increase the quality of our **service level**, which means serving our clients in time and full. Remember we are considering demand and lead time as random variables for the model.
+
+$$
+d \sim N(\mu_{d}, \sigma_{d}^{2})
+$$
+
+$$
+l\sim N(\mu_{l}, \sigma_{l}^{2})
+$$
+
+
+### Service Level ($\alpha$) & Safety Stocks
+
+**Safety stocks**, $S_s$, are a very useful buffer when we face an unusual demand. They are extra on hand inventory as a backup when we finish our predicted inventory level. They are correlated with the service level, $\alpha$, which is often expressed as percentage. How do they relate? Well by this seem to be complex equation:
+
+$$
+S_{s} = Z_{\alpha}\sigma_{l_{d}}
+$${#eq-ss}
+
+Let's undestand this equation
+
+**Factor service level**, $Z_{\alpha}$:
+
+What does it mean wanting to have 95% of service level, $\alpha$? 
+
+We have periodic demand that follows a normal distribution.
+
+$$
+d \sim N(\mu_{d}, \sigma_{d})
+$$
+
+If we compute the CDF of $d$ for any given value $x$, it will provide us with the probability that will below of $x$. We want to be extra sure about our computation of $x$, we want 95% of confidence/probability about $x$. We already know $d$  (a.k.a the probability density of demand) and we know that our objective is 95% (a.k.a. $\alpha$); we don't want the CDF we want the quantile function.
+
+$$
+F_{d}(z) = \alpha \rightarrow F_{d}^{-1} (\alpha) = z 
+$$ {#eq-alpha}
+
+This is the same property as in @eq-inversecdf but applied to the demand distribution. @eq-alpha is equal to the standard normal quantile function ($\Phi(\alpha)$)
+
+$$
+F_{d}^{-1}(\alpha) = \Phi^{-1}(\alpha) = z_{\alpha}
+$$ {#eq-factorServiceLevel}
+
+
+
+::: {.callout-note appearance="simple"}
+
+$d$ can be computed from historical demand or by a forecast
+
+:::
+
+
+**What about the other term, in** @eq-ss ?:
+
+::: {.callout-warning}
+
+Many probability theory terms coming. Read them, try to understand them. They are confusing. I would give at the end a way of how you can think of them intuitively.
+
+:::
+
+
+$Z_\alpha$ is just a factor term that will be multiplied by $\sigma_{d_{l}}$, which can be interpreted as the _variability of demand, and lead time_. @eq-ss is telling us that in order to determine the safety stocks we have to account the variability of two random variables $l$ and $d$. To do that we need the product of two random variables collapsing into a quantity that represents the integrated variability of $l$ and $d$. **How to think about it:** $\sigma_{d_{l}}$ is the area of risk of an inventory policy, the fator $Z_{\alpha}$ determines how much risk are we willing to minimize, the more we want to minimize (by increasing $\alpha$, service level), the more safety stocks, BUT, the more inventory costs holding costs. Something that you have to get clear is that safety stocks is the tool that help us battle the variability of the demand, making them essential to give an optimal service level.
+
+::: {.callout-note}
+
+## Getting more precise
+
+I am not referring to joint PDF, instead I am referring to a product two random variables which does not create any new distribution, it just describes an area behind the intersection between this two random variables, $l$ and $d$, which accounts their variability, which would be multiplied by $Z_\alpha$ factor to make sure we are $\alpha$ secure of the computation of the safety stocks. If you want to know more about this derivation, search for "product of Gaussians" or "product of random variables".
+
+I write this note because at the beginning I was confused between the difference of a joint PDF, a sum of random variables (convolution) and the product of random variables. 
+
+:::
+
+### Integrating the (S, R) policy
+
+The derivation of $\sigma_{d_{l}}$ depends on the inventory policy. The $(S, R)$ policy is particularly riskier than others because the risk time is the moment when you make an order for your suppliers, every $R$ period, till the moment it arrives (every $l$, lead time). So the risk period is: $R + l$. I will show the derived equation:
+
+$$
+S_{s} = Z_{\alpha}\sigma_{l_{d}} = Z_{\alpha} \sqrt{(\mu_{l} + R)\sigma_{d}^{2} + \sigma_{l}^{2}\mu_{d}^{2}}
+$${#eq-ssSR}
+
+
+
+# Dr.House brewery (S, R) stochastic policy simulation
+
+After all this heavy literature recap, I hope you aren't too destroyed by it, this is the start of the simulation.
+
+## 1) Setting up the variables
+
+Dr.House brewery wants to simulate its daily **net inventory**:
+
+$$
+net\ inventory = on\ hand\ inventory\ + in\ transit\ inventory\ - backorders 
+$${#eq-net}
+
+But before starting they made some research and obtained the below parameters shown in the table. Notice the choice of using a service level, $\alpha$, of 95% (remember the importance of $\alpha$ for calculating safety stocks @eq-ss).
+
+```{r}
+#| label: fig-table
+
+# 1) Define Lead time and 
+set.seed(2025)         # For reproducibility
+t <- 365               # days
+d_mu <- 100; l_mu = 4  # daily demand [units/day]
+d_std <- 25; l_std = 1 # daily lead time 
+
+# Parameters:
+params <- list(
+  k = 100, # fixed cost of a single transaction [$/order] 
+  h = 0.5, # yearly holding costs for keeping one single piece in stock [$/unit * year]
+  d_yearly = 365 * d_mu, # yearly expected demand
+  alpha = 0.95
+)
+
+# Create the parameter table using gt package
+parameter_table <- tibble(
+  Parameter = c("t", "d_mu", "l_mu", "d_std", "l_std", "k", "h", "d_yearly", "alpha"),
+  Value = c(t, d_mu, l_mu, d_std, l_std, params$k, params$h, params$d_yearly, params$alpha),
+  Units = c("days", "units/day", "days", "units/day", "days", "$/order", "$/(unit*year)", "units/year", "dimensionless"),
+  Meaning = c(
+    "Time period (days)",
+    "Daily demand mean",
+    "Lead time mean",
+    "Daily demand standard deviation",
+    "Lead time standard deviation",
+    "Fixed cost per order",
+    "Yearly holding cost per unit",
+    "Yearly expected demand",
+    "Service level probability"
+  )
+)
+
+# Create the gt table
+gt_table <- parameter_table %>%
+  gt() %>%
+  tab_header(
+    title = "Inventory Simulation Parameters",
+    subtitle = "Model parameters and their definitions"
+  ) %>%
+  cols_label(
+    Parameter = "Parameter",
+    Value = "Value",
+    Units = "Units",
+    Meaning = "Meaning"
+  ) %>%
+  fmt_number(
+    columns = c(Value),
+    decimals = 2,
+    drop_trailing_zeros = TRUE
+  ) %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels()
+  ) %>%
+  tab_style(
+    style = cell_fill(color = "#f7f7f7"),
+    locations = cells_body(rows = seq(1, nrow(parameter_table), by = 2))
+  ) %>%
+  tab_options(
+    table.width = pct(95),
+    table.align = "left"
+  )
+
+gt_table
+```
+
+## 2) Estimating S and R
+
+In order to make the simulation we have to compute the $R$ (review period) and $S$ (order up-to level). In $(S, R)$ policy $S$ depend on $R$ given that to compute $S$ you need to compute $S_s$ (safety stocks) which depends on $R$ given @eq-ssSR. 
+
+$$
+R = \frac{Q^{*}}{D} = \sqrt{\frac{2{k}}{hD}}
+$${#eq-R}
+
+Last equation @eq-R was obtained with @eq-qstar. Next step is compute $Z_{\alpha}$ (service factor) by computing the quantile function of an standardize normal distribution,$\Phi^{-1}(\alpha)$ (remember the relation of @eq-alpha).
+
+$$
+Z_{\alpha} = \Phi^{-1}(\alpha)
+$$
+
+Then we compute @eq-ssSR, shown below.
+
+$$
+S_{s} = Z_{\alpha}\sigma_{l_{d}} = Z_{\alpha} \sqrt{(\mu_{l} + R)\sigma_{d}^{2} + \sigma_{l}^{2}\mu_{d}^{2}}
+$$
+
+As last step from this part we compute $S$:
+
+$$
+S = d_{l} + d_{R} + S_{s} = \mu_{l}R + \mu_{d} + S_{s}
+$$
+
+All of this calculations are done in the code below.
+
+```{r}
+#| label: S-and-R
+
+# Review period (years -> days)
+R <- sqrt((2 * params$k) / (params$h * params$d_yearly)) # years between orders
+r_period <- max(1, round(365 * R))                       # days between reviews (>=1)
+
+# Safety stock and S
+z_alpha <- qnorm(params$alpha)
+ss <- z_alpha * sqrt((l_mu + r_period) * d_std^2 + l_std^2 * d_mu^2)
+S <- (l_mu + r_period) * d_mu + ss
+
+```
+
+
+## 3) Initialize vectors
+
+We are going to run a for-loop like the one that produced @fig-plot1 but much more complex. As describe we want to simulate the net inventory, shown in @eq-net. But first let's breaking down into parts and look at the code --- it will make sense in the next section.
+
+
+```{r}
+#| label: Vectors
+
+n_days <- t
+max_lead_time <- ceiling(l_mu + 3 * l_std) + 5
+# in_transit rows are calendar days; we only store arrival quantities
+in_transit <- matrix(0, nrow = n_days + max_lead_time, ncol = 1)
+colnames(in_transit) <- c("quantity")
+
+# Pre-sample all daily demand
+d <- pmax(0, round(rnorm(n_days, d_mu, d_std)))
+
+# Outputs of for-loop
+on_hand <- numeric(n_days)
+backorders <- numeric(n_days)
+inventory_position <- numeric(n_days)  # on-hand + on-order - backorders
+orders <- numeric(n_days)
+lead_times <- numeric(n_days)
+
+# initial state (before day 1)
+on_hand_prev <- S      # starting full to S
+backorders_prev <- 0
+
+```
+
+### A word about in-transit/on-order inventory
+
+In-transit inventory, for the purposes of this simulation, works as a calendar that will keep track how many days has been since an order was made. More formally it is a calendar-based matrix of future scheduled arrivals. This is what makes the model to have *memory* about the lead-time variability.
+
+## 4) For-loop simulation
+
+Let's start with the **friendly** explication of the simulation:
+
+Every loop is a day (`for (day in 1:n_days){}`). An inventory-day is divided in three: 
+
++ **Mornings**:
+  + In the morning we check whether there is any arrival from our suppliers `arrival_qty <- in_transit[day, "quantity"]`
+  + Also we check if we have any back-order `backorders_prev > 0`. If we do, `backorders_prev > 0 = TRUE`, then that means we haven't had any on-hand inventory, which means that the only way to fulfill a back-order is if there is any arrival from the in-transit suppliers `arrival_qty > 0`. If `arrival_qty > 0 = TRUE` then we check if the inventory is enough to fulfill all back-orders(the condition is `arrival_qty >= backorders_prev`), if not then you just subtract the remaining back-orders with the previous ones. The code for all the morning part is down below.
+  
+```{r}
+#| label: Morning-loop-part
+#| execute: FALSE
+#| results: FALSE   # Show results (output)
+#| output: FALSE     # Show output
+
+for (day in 1:n_days) {
+  # arrivals this morning
+  arrival_qty <- in_transit[day, "quantity"]
+  
+  # 1) allocate arrivals to existing bac-korders first
+  if (arrival_qty > 0 && backorders_prev > 0) {
+    if (arrival_qty >= backorders_prev) {
+      arrival_remaining <- arrival_qty - backorders_prev
+      backorders_cur <- 0
+      on_hand_cur <- on_hand_prev + arrival_remaining
+    } else {
+      # arrival not enough to clear back-orders
+      backorders_cur <- backorders_prev - arrival_qty
+      on_hand_cur <- on_hand_prev  # usually 0 when back-orders exist
+    }
+  } else {
+    # no back-orders or no arrivals
+    backorders_cur <- backorders_prev
+    on_hand_cur <- on_hand_prev + arrival_qty
+  }
+  #>....
+  #>....
+  #>.... Next part, during the day
+}
+
+```
+
++ During the day.
+  + We first ask us *"Can we satisfy the today's demand given our on-hand inventory?* with the condition `on_hand_cur >= d[day]`.
+
+```{r}
+#| label: Day-loop-part
+#| execute: FALSE
+#| results: FALSE   # Show results (output)
+#| output: FALSE     # Show output
+
+
+  #>....
+  #>....
+  #>....
+  if (on_hand_cur >= d[day]) {
+    on_hand_cur <- on_hand_cur - d[day]
+    # backorders_cur remains whatever it is (possibly 0)
+  } else {
+    # demand exceeds on-hand -> create backorders
+    backorders_cur <- backorders_cur + (d[day] - on_hand_cur)
+    on_hand_cur <- 0
+  }
+  #>....
+  #>....
+  #>....Next part, end of the day
+```
+
++ Nights.
+  + We keep track of in-transit inventory --- aside from the daily routine, `on_hand_cur >= d[day]` condition is a safeguard for the last day of the simulation. It prevents an error and ensures that once the model time-period is over, the model stops looking for future arrivals from the in-transit inventory.
+  + Our Excel with all the daily data has to be updated with the @eq-net (net-inventory is the same as `inventory_position`)
+  + Finally we make a periodic review $R$ if it is review time, `day %% r_period == 0 = TRUE`. If the condition is `TRUE` we have check the order quantity, the lead-time our suppliers, and aproximate the arrival day (trusting in the word our suppliers); we keep track of new order with our in-transit calendar.
+
+```{r}
+#| label: Night-loop-part
+#| execute: FALSE
+#| results: FALSE   # Show results (output)
+#| output: FALSE     # Show output
+  
+for (day in 1:n_days) {
+  #>....
+  #>....
+  #>....
+  # 3) compute on-order (future arrivals) and inventory position
+  if (day < nrow(in_transit)) {
+    total_in_transit <- sum(in_transit[(day + 1):nrow(in_transit), "quantity"])
+  } else {
+    total_in_transit <- 0
+  }
+  inv_pos <- on_hand_cur + total_in_transit - backorders_cur
+  
+  # save
+  on_hand[day] <- on_hand_cur
+  backorders[day] <- backorders_cur
+  inventory_position[day] <- inv_pos
+  
+  # 4) periodic review: order up to S (inventory position used)
+  if (day %% r_period == 0) {
+    l_time <- max(1, round(rnorm(1, l_mu, l_std)))
+    order_qty <- max(0, S - inv_pos)
+    arrival_day <- day + l_time
+    if (arrival_day <= nrow(in_transit)) {
+      in_transit[arrival_day, "quantity"] <- in_transit[arrival_day, "quantity"] + order_qty
+    } else {
+      # arrival beyond simulation time period/horizon — ignore or extend in_transit
+      # Here we ignore
+    }
+    orders[day] <- order_qty
+    lead_times[day] <- l_time
+    
+    cat(sprintf("Day %3d REVIEW: inv_pos = %.1f, order = %.0f, lead = %d (arrive day %d)\n",
+                day, inv_pos, order_qty, l_time, arrival_day))
+  }
+  
+  # update previous for next day
+  on_hand_prev <- on_hand_cur
+  backorders_prev <- backorders_cur
+}
+
+```
+
+Below the whole code:
+
+```{r}
+#| label: Stochatic-Simulation
+
+for (day in 1:n_days) {
+  # arrivals this morning
+  arrival_qty <- in_transit[day, "quantity"]
+  
+  # 1) allocate arrivals to existing backorders first
+  if (arrival_qty > 0 && backorders_prev > 0) {
+    if (arrival_qty >= backorders_prev) {
+      arrival_remaining <- arrival_qty - backorders_prev
+      backorders_cur <- 0
+      on_hand_cur <- on_hand_prev + arrival_remaining
+    } else {
+      # arrival not enough to clear backorders
+      backorders_cur <- backorders_prev - arrival_qty
+      on_hand_cur <- on_hand_prev  # usually 0 when backorders exist
+    }
+  } else {
+    # no outstanding backorders or no arrivals
+    backorders_cur <- backorders_prev
+    on_hand_cur <- on_hand_prev + arrival_qty
+  }
+  
+  # 2) satisfy today's demand (d[day])
+  if (on_hand_cur >= d[day]) {
+    on_hand_cur <- on_hand_cur - d[day]
+    # backorders_cur remains whatever it is (possibly 0)
+  } else {
+    # demand exceeds on-hand -> create backorders
+    backorders_cur <- backorders_cur + (d[day] - on_hand_cur)
+    on_hand_cur <- 0
+  }
+  
+  # 3) compute on-order (future arrivals) and inventory position
+  if (day < nrow(in_transit)) {
+    total_in_transit <- sum(in_transit[(day + 1):nrow(in_transit), "quantity"])
+  } else {
+    total_in_transit <- 0
+  }
+  inv_pos <- on_hand_cur + total_in_transit - backorders_cur
+  
+  # save
+  on_hand[day] <- on_hand_cur
+  backorders[day] <- backorders_cur
+  inventory_position[day] <- inv_pos
+  
+  # 4) periodic review: order up to S (inventory position used)
+  if (day %% r_period == 0) {
+    l_time <- max(1, round(rnorm(1, l_mu, l_std)))
+    order_qty <- max(0, S - inv_pos)
+    arrival_day <- day + l_time
+    if (arrival_day <= nrow(in_transit)) {
+      in_transit[arrival_day, "quantity"] <- in_transit[arrival_day, "quantity"] + order_qty
+    } else {
+      # arrival beyond simulation time period/horizon — ignore or extend in_transit
+      # Here we ignore
+    }
+    orders[day] <- order_qty
+    lead_times[day] <- l_time
+    
+    cat(sprintf("Day %3d REVIEW: inv_pos = %.1f, order = %.0f, lead = %d (arrive day %d)\n",
+                day, inv_pos, order_qty, l_time, arrival_day))
+  }
+  
+  # update previous for next day
+  on_hand_prev <- on_hand_cur
+  backorders_prev <- backorders_cur
+}
+
+# We compute a tibble data frame for a plot
+results <- tibble(
+  days = 1:n_days,
+  on_hand = on_hand,
+  backorders = backorders,
+  inventory_position = inventory_position,
+  demand = d,
+  order_qty = orders
+)
+
+results |> print(n = 10)
+```
+
+PLOT!!!!!!
+
+```{r}
+#| label: fig-plot6
+#| fig-cap: "1st Simulation:In red is the back-orders and in blue the on-hand inventory "
+results|> 
+  ggplot(aes(x = days)) +
+  geom_line(aes(y = on_hand), colour = "#1E90FF", size = 1) +
+  geom_line(aes(y = backorders), colour = "red", size = 1) +
+  theme_bw() +
+  labs(
+    title = "Stochastic simulation of a (R, S) policy",
+    subtitle = "With alpha = 0.95" 
+  )+
+  geom_vline(xintercept = seq(0, n_days, r_period), 
+             linetype = "dashed", alpha = 0.5, color = "orange", size = 1)+
+  annotate("text", x = seq(0, n_days, r_period), y = s + 1, 
+           label = "Reorder", size = 3, angle = 90, vjust = -0.5)
+```
+
+### Learning by playing
+
+Let's simulate again everything but changing $\alpha$ to 50% and increase the variability of the lead-time $\sigma^{2}_{l}$ to 15. 
+
+```{r}
+#| label: fig-plot7
+#| fig-cap: "2ng Simulation: In red is the back-orders and in blue the on-hand inventory. Notice how much redish "
+
+# 1) Define Lead time and 
+set.seed(2025)         # For reproducibility
+t <- 365               # days
+d_mu <- 100; l_mu = 4  # daily demand [units/day]
+d_std <- 25; l_std = 15 # daily lead time 
+
+# Parameters:
+params2 <- list(
+  k = 100, # fixed cost of a single transaction [$/order] 
+  h = 0.5, # yearly holding costs for keeping one single piece in stock [$/unit * year]
+  d_yearly = 365 * d_mu, # yearly expected demand
+  alpha = 0.50
+)
+
+
+# Review period (years -> days)
+R <- sqrt((2 * params2$k) / (params2$h * params2$d_yearly))      # years between orders
+r_period <- max(1, round(365 * R))                            # days between reviews (>=1)
+
+# Safety stock and S
+z_alpha <- qnorm(params2$alpha)
+ss <- z_alpha * sqrt((l_mu + r_period) * d_std^2 + l_std^2 * d_mu^2)
+S <- (l_mu + r_period) * d_mu + ss
+
+n_days <- t
+max_lead_time <- ceiling(l_mu + 3 * l_std) + 5
+# in_transit rows are calendar days; we only store arrival quantities
+in_transit <- matrix(0, nrow = n_days + max_lead_time, ncol = 1)
+colnames(in_transit) <- c("quantity")
+
+# Pre-sample all daily demand
+d <- pmax(0, round(rnorm(n_days, d_mu, d_std)))
+
+# Outputs
+on_hand <- numeric(n_days)
+backorders <- numeric(n_days)
+inventory_position <- numeric(n_days)  # on-hand + on-order - backorders
+orders <- numeric(n_days)
+lead_times <- numeric(n_days)
+
+# initial state (before day 1)
+on_hand_prev <- S      # starting full to S
+backorders_prev <- 0
+
+for (day in 1:n_days) {
+  # arrivals this morning
+  arrival_qty <- in_transit[day, "quantity"]
+  
+  # 1) allocate arrivals to existing backorders first
+  if (arrival_qty > 0 && backorders_prev > 0) {
+    if (arrival_qty >= backorders_prev) {
+      arrival_remaining <- arrival_qty - backorders_prev
+      backorders_cur <- 0
+      on_hand_cur <- on_hand_prev + arrival_remaining
+    } else {
+      # arrival not enough to clear backorders
+      backorders_cur <- backorders_prev - arrival_qty
+      on_hand_cur <- on_hand_prev  # usually 0 when backorders exist
+    }
+  } else {
+    # no outstanding backorders or no arrivals
+    backorders_cur <- backorders_prev
+    on_hand_cur <- on_hand_prev + arrival_qty
+  }
+  
+  # 2) satisfy today's demand (d[day])
+  if (on_hand_cur >= d[day]) {
+    on_hand_cur <- on_hand_cur - d[day]
+    # backorders_cur remains whatever it is (possibly 0)
+  } else {
+    # demand exceeds on-hand -> create backorders
+    backorders_cur <- backorders_cur + (d[day] - on_hand_cur)
+    on_hand_cur <- 0
+  }
+  
+  # 3) compute on-order (future arrivals) and inventory position
+  if (day < nrow(in_transit)) {
+    total_in_transit <- sum(in_transit[(day + 1):nrow(in_transit), "quantity"])
+  } else {
+    total_in_transit <- 0
+  }
+  inv_pos <- on_hand_cur + total_in_transit - backorders_cur
+  
+  # save
+  on_hand[day] <- on_hand_cur
+  backorders[day] <- backorders_cur
+  inventory_position[day] <- inv_pos
+  
+  # 4) periodic review: order up to S (inventory position used)
+  if (day %% r_period == 0) {
+    l_time <- max(1, round(rnorm(1, l_mu, l_std)))
+    order_qty <- max(0, S - inv_pos)
+    arrival_day <- day + l_time
+    if (arrival_day <= nrow(in_transit)) {
+      in_transit[arrival_day, "quantity"] <- in_transit[arrival_day, "quantity"] + order_qty
+    } else {
+      # arrival beyond simulation time period/horizon — ignore or extend in_transit
+      # Here we ignore
+    }
+    orders[day] <- order_qty
+    lead_times[day] <- l_time
+    
+    # cat(sprintf("Day %3d REVIEW: inv_pos = %.1f, order = %.0f, lead = %d (arrive day %d)\n",
+    #            day, inv_pos, order_qty, l_time, arrival_day))
+  }
+  
+  # update previous for next day
+  on_hand_prev <- on_hand_cur
+  backorders_prev <- backorders_cur
+}
+
+results_2 <- tibble(
+  days = 1:n_days,
+  on_hand = on_hand,
+  backorders = backorders,
+  inventory_position = inventory_position,
+  demand = d,
+  order_qty = orders
+)
+
+
+results_2|> 
+  ggplot(aes(x = days)) +
+  geom_line(aes(y = on_hand), colour = "blue", size = 1) +
+  geom_line(aes(y = backorders), colour = "red", size = 1) +
+  theme_bw() +
+  labs(
+    title = "Stochastic simulation of a (R, S) policy",
+    subtitle = "With alpha = 0.50" 
+  )+
+  geom_vline(xintercept = seq(0, n_days, r_period), 
+             linetype = "dashed", alpha = 0.5, color = "orange", size = 1)+
+  annotate("text", x = seq(0, n_days, r_period), y = s + 1, 
+           label = "Reorder", size = 3, angle = 90, vjust = -0.5)
+```
+
+Wow, compare @fig-plot6 with @fig-plot7. Changing $\alpha$ & $\sigma^{2}_{l}$ really makes the inventory more insecure. I suggest changing the hyperparameters of demand and lead-time, you will see big changes in the behavior of the simulation at the same time, change $\alpha$, you will that while increasing the variability of the model, keeping an $\alpha$ above 90% will really keep your inventory safe.
+
+## Sad reality
+
+There's something sad around this last simulation. It also has assumptions that hurts the accuracy. Assumptions:
+
+- Normality. Demand nor lead-time aren't normal. They are descrite variables.
+- Independence. We are assuming that demand and lead-time are independent of each other this can be untrue, we have to check their correlation.
+- Stationary. Demand has high autocorrelation, therefore it does not behave like in @fig-plot8.
+- Different orders can cross each other.
+
+```{r}
+#| label: fig-plot8
+#| fig-cap: "This kind of behavior isn't real. There is high autocorrelation "
+
+
+plot8 <- results |> 
+  ggplot(aes(x = days, y = demand)) +
+  geom_line(color = "firebrick1") +
+    theme_bw() +
+  labs(
+    title = "Demand",
+    subtitle = "Stationarity demand is behaving" 
+  )
+
+plot8
+```
+
+All of these makes the stochastic model with room for improvement --- but not for this model.
+
+# Reflection
+
+Making an inventory simulation isn't as easy as someone would had thinked. Complex supply chains demand us making adjustments to old models, like EOQ model where @eq-qstar was derived. This seems to be part of an ever changing world that after the reinascance the rate of change has increased dramatically. However, this old simplistic models do help us makes sense the phenoma we are trying to understand; and this can be applied to all models, not even mathematicals, at the end we live in a world we don't understand. 
+
+## P.D.
+
+I thougt this article would take me 2 days to finish. It took me 5. I am quite exhausted. I just love doing some math, and trying to make sense of the world and do crazy stuff. Anyone who came all the way to here, I hope you liked it; I know math can be hard, but it really is usefull, and congrats if you made the effort, go right now to celebrate with your love ones. Cheers. 
 
 
 
