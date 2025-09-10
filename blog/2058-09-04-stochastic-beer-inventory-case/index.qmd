@@ -13,6 +13,7 @@ date: 2025-09-09
 code-block-bg: true
 code-block-border-left: "#31BAE9"
 
+bibliography: references.bib
 
 execute:
   echo: true       # Show code 
@@ -24,9 +25,11 @@ execute:
 
 # Introduction
 
-Strangely enough, two years ago I was wandering in the college library thinking *"what do quality engineers do?"*; in my mind it's common for me to be wondering that given the nature of my undergraduate degree (biotech engineer). Reading about it I stumbled with terms like Lean Six Sigma, DMAIC, SKUs, KPIs, etc..., but I wasn't compelled because I read a word that made me turn my stomach. ***Gurus***. I couldn't handle that word at the time. *"How can a serious book for engineers follow someone known as a guru"* I thought. I wouldn't have imagined that 2 years from that moment I would be digging into philosophies from thes gurus --- being Juran's my favorite.
+Strangely enough, two years ago I was wandering in the college library thinking *"what do quality engineers do?"*; in my mind it's common for me to be wondering that given the nature of my undergraduate degree (biotech engineer). Reading about it I stumbled with terms like Lean Six Sigma, DMAIC, SKUs, KPIs, etc..., but I wasn't compelled because I read a word that made me turn my stomach. ***Gurus***. I couldn't handle that word at the time. *"How can a serious book for engineers follow someone known as a guru"* I thought. I wouldn't have imagined that 2 years from that moment I would be digging into philosophies from these gurus --- being Juran's my favorite.
 
 A big part of quality is **Inventory management**, and that's the topic for my second blog. This is the objective: teach you how to make a simulation of a beer business model for its inventory management using **R + tidyverse**. You cannot be vague nor lie to a computer; so if you program it, you know it.
+
+This blog is heavily influenced by @vandeput2020 fantastic book about inventory optimization --- I am half through it. If you want get into inventory theory I fully recommend this book, he really explains it phenomenally.
 
 We will be using the next packages:
 
@@ -40,7 +43,7 @@ library(igraph)    # for graphs
 
 # Beer business
 
-Beer companies have five principal raw materials that tehy have to order from their suppliers: malt, hops, yeast, bottles, and caps. But:
+Beer companies have five principal raw materials that they have to order from their suppliers: malt, hops, yeast, bottles, and caps. But:
 
 -   When should they order?
 -   How much should they order?
@@ -68,11 +71,11 @@ While there are many policies, Dr.House Brewer has a very popperian philosophy a
 We will assume two things:
 
 -   The **demand** of the customers, $d$, is constant/fixed
--   The **lead time** for the materials to arrive at the warehouse, $L$, does NOT exist
+-   The **lead time** for the materials to arrive at the warehouse, $l$, does NOT exist
 
-These are strong assumptions that are going to be a key point latter in this blog. Lets think of $L = 0$; if there is no lead time, $L$, the moment it is your reorder time $R$, thet is the moment you get it. This is never the case, but we are going to assume it for the moment.
+These are strong assumptions that are going to be a key point latter in this blog. Let's think of $l$; if there is no lead time, $l = 0$, the moment it is your reorder time, $R$, is the moment you get it. This is never the case, but we are going to assume it for the moment.
 
-We need to define the demand, $d$, the time period (in this case daily), $R$ and $S$, so...,
+We need to define the demand, $d$, the time period (in this daily case), $R$ and $S$, so...,
 
 ```{r}
 #| label: (R, S) policy-simulation-1
@@ -108,7 +111,7 @@ for (i in 1:n_days) {
 }
 ```
 
-**Logic:** our inventory array will be decreasing per day given the constant demand, but given that we have a periodic review, $R$, the moment it is $R$-day the moment it replenishes your inventory (remember we won't be waiting any time between order and the supplies arriving at the warehouse, there is no **lead time**) to an up-to level reorder point, $S$. We need a for-loop that will help us evaluate whether the inventory per *i* day. A day is composed of mornings and evenings; in the morning we evaluate whether it is $R$-day or not, this is whatthe first condition does `(i - 1) %% r_period`; inside the loop:
+**Logic:** our inventory array will be decreasing per day given the constant demand, but given that we have a periodic review, $R$, the moment it is $R$-day the moment it replenishes your inventory (remember we won't be waiting any time between order and the supplies arriving at the warehouse, there is no **lead time**) to an up-to level reorder point, $S$. We need a for-loop that will help us evaluate whether the inventory per *i* day. A day is composed of mornings and evenings; in the morning we evaluate whether it is $R$-day or not, this is what the first condition does `(i - 1) %% r_period`; inside the loop:
 
 | Day     | Evaluation       | Result  | Note                                 |
 |---------|------------------|---------|--------------------------------------|
@@ -118,7 +121,7 @@ for (i in 1:n_days) {
 | `.....` | `.....`          | `.....` | `.....`                              |
 | `i = 6` | `(6-1) %% 5` = 0 | `True`  | equal to 0                           |
 
-The next conditional, `else if (i > 1)` , is just  saying *"Is this NOT the first day AND NOT a review day? If YES, start with yesterday's leftover inventory"*. Then by the end of the day we have `inventory[i] - demand` inventory.
+The next conditional, `else if (i > 1)` , is just saying *"Is this NOT the first day AND NOT a review day? If YES, start with yesterday's leftover inventory"*. Then by the end of the day we have `inventory[i] - demand` inventory.
 
 ::: callout-note
 You can make this for-loop a function with `simulate_inventory <- function(s, r_period, demand, n_days)` as parameters, if you want.
@@ -155,15 +158,15 @@ plot_1
 
 @fig-plot1 shows the plot of inventory vs time. Note how the assumptions affect the simulation: there is an instantaneous replenishment of the inventory level and the inventory level is decreasing uniformly (just a straight line) given constant daily demand. This policy does not show fluctuations in time, but it can be risky because you can get into red levels of inventory level given an unexpected increase in demand and being far from $R$-day (or any given time-period).
 
-Dr.House Brewer has chosen hits policy, how can it be optimized?
+Dr.House Brewer has chosen its policy, how can it be optimized?
 
 ::: callout-note
-**Inventory Level** is the net inventory: available on-hand inventory and in-transit inventory, minus backorders, orders not yet shipped, etc.
+**Inventory Level** is the net inventory: available on-hand inventory and in-transit inventory, minus back-orders, orders not yet shipped, etc.
 :::
 
 # Supply chains & Inventories
 
-There are three topics to keep in mind in the supply chain: suppliers, warehouse, and customers (@fig-plot2). The important question for us, the inventory managers at Dr.House Brewery warehouse, is to ask: **_ How much should I order?_**. We have a policy, but how can we plan it? It turns out this isn't an easy question to answer, because as the population increases, so do the customers, the suppliers and the warehouses, and big companies have it tough. That's why we need a model that can help us navigate this complex supply chains.
+There are three topics to keep in mind in the supply chain: suppliers, warehouse, and customers (@fig-plot2). The important question for us, the inventory managers at Dr.House Brewery warehouse, is to ask: \*\*\_ How much should I order?\_\*\*. We have a policy, but how can we plan it? It turns out this isn't an easy question to answer, because as the population increases, so do the customers, the suppliers and the warehouses, and big companies have it tough. That's why we need a model that can help us navigate this complex supply chains.
 
 ```{r}
 #| label: fig-plot2
@@ -194,15 +197,15 @@ Where $C$ is cost, and $Q$ is order quantity. There is two types of costs:
 
 -   **Holding costs**. Costs associated with storing products. Two types:
 
--   **Variable holding costs** (e.g. losses)
+    -   **Variable holding costs** (e.g. losses)
 
--   **Fixed holding costs** (e.g. employees)
+    -   **Fixed holding costs** (e.g. employees)
 
 -   **Transaction Costs**. All costs associated with ordering the product from the suppliers. Not only transportation. Two types:
 
--   **Variable transaction costs** (e.g. packaging)
+    -   **Variable transaction costs** (e.g. packaging)
 
--   **Fixed transaction costs** (e.g. fixed fees)
+    -   **Fixed transaction costs** (e.g. fixed fees)
 
 We won't be caring for **Variable transaction costs** because they do not depend on $Q$ (they depend on the demand, $d$). This is the equation:
 
@@ -221,7 +224,7 @@ $$
 C(Q) = \left( \frac {[currency]} {[unit]  [time]} * \frac {[item]}{1} \right) +  \left( \frac{[currency]}{[order]} * \frac {[unit]}{[time]} * \frac{1}{[unit]}      \right)
 $$
 
-Since $[order]$ is a count, it is often considered dimensionally equivalent to a pure number, adimensionally. So:
+Since $[order]$ is a count, it is often considered dimensionally defined as equivalent to a pure number, dimensionless.
 
 $$
 C(Q) = \left( \frac {[currency]} {[unit]  [time]} * \frac {[item]}{1} \right) +  \left( \frac{[currency]}{1} * \frac {[unit]}{[time]} * \frac{1}{[unit]}      \right)
@@ -232,7 +235,7 @@ $$
 $$
 :::
 
-### What does it all mean?
+### What does it all mean? 
 
 I won't be focusing on the code, for the moment (it is relatively easy this chunk of code), because it isn't really important. What is important is understanding the EOQ equation ($C(Q)$). So let's focus on the plots:
 
@@ -307,7 +310,7 @@ plot_4
  
 ```
 
-Holding costs are easy to understand (look at @fig-plots-1) as you increase the order quantity, the more you inventory you have, therefore more holding costs. But what about transaction cost (@fig-plots-2); imagine you increase the order of hoops for the brewery, the more you increase the order quantity the less transactions with your supplier, but it has a limit. Combine, the total costs (@fig-plots-3), we can observe that there is minimum, which is point we want to archieve; this minimum is in a big somwhat flat area, this is great for the practioner (us)!, it means that there is room for being wrong and the same time not being so wrong. We can obtain the minimum by deriving total costs function over $Q$. This is the derived equation (we will call it $Q^{*}$, "q-star"):
+Holding costs are easy to understand (look at @fig-plots-1); as you increase the order quantity, the more your inventory, therefore more holding costs. But what about transaction cost (@fig-plots-2); imagine you increase the order of hoops for the brewery, the more you increase the order quantity the less transactions with your supplier, but it has a limit. Combine, the total costs (@fig-plots-3), we can observe that there is minimum, which is point we want to archive; this minimum is in a big somewhat flat area, this is great for the practitioner (us)!, it means that there is room for being wrong and the same time not being so wrong. We can obtain the minimum by deriving total costs function over $Q$. This is the derived equation (we will call it $Q^{*}$, "q-star"):
 
 $$
 \frac{dC }{dQ} = Q^{*}  =  \sqrt[2]{\frac{2kd}{h}}
@@ -315,20 +318,18 @@ $$ {#eq-qstar}
 
 This means that in order to optimize the order quantity, $Q^*$, you want to avoid the transaction costs by increasing the order quantity, BUT, you don't want to overdo it because by increasing the $Q$, you increase the holding costs $h$ (there will just be too many inventory to handle). As with much in life, it is a **balance**.
 
-We can replace $Q^{*}$ in @eq-qstar to find the minimum cost --- we won't do it though.
+We can replace $Q^{*}$ in @eq-qstar to find the minimum cost --- we won't do it.
 
 However, all of this is quite far from reality, and that's okay!!! These kinds of models (deterministic models), in my opinion, are not meant to forecast with infinite precision the phenomena; instead they are meant to make some sense of it and build some intuition, which is often more valuable than doing the model itself. That's why it is worth learning them.
 
-
-# Stochastic modelling or _A number isn't just a number_
+# Stochastic modelling or *A number isn't just a number*
 
 Here are the assumptions we have made so far:
 
-- The **demand**, $d$, is constant
-- There is no **lead time**, $l$, (the waiting time for the supplies to arrive since the order is made)
+-   The **demand**, $d$, is constant
+-   There is no **lead time**, $l$, (the waiting time for the supplies to arrive since the order is made)
 
-They are strong assumptions because in reality the demand is variable, and there is lead time which is also variable. 
-We are going to incorporate these assumptions into the model, making it stochastic. Stochastic is just another word for randomness, and a stochastic model is just the incorporation of random variables (in this case $d$, and $l$) to the model. Why? It helps us deal with uncertainty.
+They are strong assumptions because in reality the demand is variable, and there is lead time which is also variable. We are going to incorporate these assumptions into the model, making it stochastic. Stochastic is just another word for randomness, and a stochastic model is just the incorporation of random variables (in this case $d$, and $l$) to the model. Why? It helps us deal with uncertainty.
 
 e.g. Imagine we want to estimate how much should we order. We use the derived $Q*$ to make an estimate, but that estimate can be interpreted as an average of a normal distribution; if we use it we are saying there is still a 50% cumulative probability that there will not be enough **on-hand** inventory to cover the demand. No good news. In other words, you are gambling that you will have enough on-hand inventory by tossing a coin. This scenario is too risky but that risk can be manageable by taking into account in the model the same uncertainty. Rephrasing: Stochastic models help us make decisions under uncertainty. We will still be making plenty of assumptions but at least this model is more fit for real-case scenarios
 
@@ -338,7 +339,7 @@ We will be assuming that **demand**, $d$, and **lead time**, $l$, have a normal 
 
 ### Hyperparameters
 
-Here is a controversial opinion, I do not like the Normal distribution. I am done, I said it. It just tells there is an expected value, the mean $\mu$,  and perturbations around it, the standard deviation $\sigma^2$. That phrasing can be applied to every single stuff, and I am very cautious when the universality principle can be applied, also in a way you are expressing ignorance because if you only know that there is perturbations around a mean, you don't know if that how that perturbations are behaving, which is the idea, capture that uncertainty of the phenomena. Having said that, normal distributions are very helpful to make estimates despite its universality --- also they are wildly use because of the central limit theorem which ultimately says that every phenomena will behave as a normal distribution as data is gathered to infinite. So assuming normality for **demand**, $d$, and **lead time**, $l$ variables:
+Here is a controversial opinion, I do not like the Normal distribution. I am done, I said it. It just tells there is an expected value, the mean $\mu$, and perturbations around it, the standard deviation $\sigma^2$. That phrasing can be applied to every single stuff, and I am very cautious when the universality principle can be applied, also in a way you are expressing ignorance because if you only know that there is perturbations around a mean, you don't know how that perturbations are behaving, which is the idea, capture that uncertainty of the phenomena. Having said that, normal distributions are very helpful to make estimates despite its universality --- also they are wildly use because of the central limit theorem which ultimately says that every phenomena will behave as a normal distribution as data is gathered to infinite. So assuming normality for **demand**, $d$, and **lead time**, $l$ variables:
 
 $$
 d \sim N(\mu_{d}, \sigma_{d}^{2})
@@ -347,6 +348,13 @@ $$
 $$
 l\sim N(\mu_{l}, \sigma_{l}^{2})
 $$
+
+
+::: {.callout-note appearance="simple"}
+
+More about skepticism about normal distributions can be found in @taleb2007 book the Black Swan, term taken from the classical problem of inference, Hume's problem. If you like science you should know it.
+
+:::
 
 We can read the last equations as "demand and lead time follows a normal distribution of with **hyperparameters** mean $\mu_x$ and standard deviation $\sigma^{2}_{x}$". We will only care for the hyperparameters, nothing else, just to make it simple and not dealing with a lot of algebra, also because we can describe this distribution just with these hyperparameters, like in @fig-plot3.
 
@@ -383,9 +391,9 @@ plot_5
 
 ### PDF & CDF
 
-The normal distribution is a Probability _Density_ Function (PDF). That word, density, is important because it tell us that a normal distribution can take a continuous array of values; if we are saying that demand follows a normal distribution we are sayinf that it can take continuous values. This is not the case: "please give me 2.12419 kegs of beer", that does not make sense. This is another assumption that we are explicitly making. 
+The normal distribution is a Probability *Density* Function (PDF). That word, density, is important because it tell us that a normal distribution can take a continuous array of values; if we are saying that demand follows a normal distribution we are saying that it can take continuous values. This is not the case: "please give me 2.12419 kegs of beer", that does not make sense. This is another assumption that we are explicitly making.
 
-Another important subject is a Cumulative Density Functions (CDFs). Every PDF has its CDF. They are just the accumulative probability of of its relative PDF. @fig-plot4 shows both a PDF and CDF of a standardized normal distribution, $X \sim N(\mu = 0, \sigma^2 = 1)$. CDFs are important because they help access the risk of choosing a value within our normal distribution, or any PDF.
+Another important subject is a Cumulative Density Function (CDF). Every PDF has its CDF. They are just the accumulative probability of of its relative PDF. @fig-plot4 shows both a PDF and CDF of a standardized normal distribution, $X \sim N(\mu = 0, \sigma^2 = 1)$. CDFs are important because they help access the risk of choosing a value within our normal distribution, or any PDF.
 
 ```{r}
 #| label: fig-plot4
@@ -475,12 +483,11 @@ plot_7 <- ggplot(df, aes(x = x, y = y)) +
 plot_7
 ```
 
-
 If you think a quantile is just another way of describing a CDF, you are not alone, it is a common misconception. They are closely related and this relationship will become important. While a CDF function, $F(x)$, computes the cumulative range of probabilities, $p$, that are bigger or equal of $x$, $P(X \le  x) = F(x) = p$; a quantile function computes the value, $x$, to obtain a range of probabilities $p$. In other words a quantile function is the inverse of the CDF function, $F^{-1}(p) = x$. This is the explicit relationship:
 
 $$
 F(x) = p  \quad \leftrightharpoons  \quad F^{-1}(p) = x
-$${#eq-inversecdf}
+$$ {#eq-inversecdf}
 
 ## Stochastic EOQ model
 
@@ -494,20 +501,19 @@ $$
 l\sim N(\mu_{l}, \sigma_{l}^{2})
 $$
 
-
 ### Service Level ($\alpha$) & Safety Stocks
 
-**Safety stocks**, $S_s$, are a very useful buffer when we face an unusual demand. They are extra on hand inventory as a backup when we finish our predicted inventory level. They are correlated with the service level, $\alpha$, which is often expressed as percentage. How do they relate? Well by this seem to be complex equation:
+**Safety stocks**, $S_s$, are a very useful buffer when we face an unusual demand. They are extra on hand inventory as a backup when we finish our predicted inventory level. They are related with the service level, $\alpha$, which is often expressed as percentage. How do they relate? Well by this seem to be complex equation:
 
 $$
 S_{s} = Z_{\alpha}\sigma_{l_{d}}
-$${#eq-ss}
+$$ {#eq-ss}
 
-Let's undestand this equation
+Let's understand this equation
 
 **Factor service level**, $Z_{\alpha}$:
 
-What does it mean wanting to have 95% of service level, $\alpha$? 
+What does it mean wanting to have 95% of service level, $\alpha$?
 
 We have periodic demand that follows a normal distribution.
 
@@ -515,7 +521,7 @@ $$
 d \sim N(\mu_{d}, \sigma_{d})
 $$
 
-If we compute the CDF of $d$ for any given value $x$, it will provide us with the probability that will below of $x$. We want to be extra sure about our computation of $x$, we want 95% of confidence/probability about $x$. We already know $d$  (a.k.a the probability density of demand) and we know that our objective is 95% (a.k.a. $\alpha$); we don't want the CDF we want the quantile function.
+If we compute the CDF of $d$ for any given value $x$, it will provide us with the probability that will below of $x$. We want to be extra sure about our computation of $x$, we want 95% of confidence/probability about $x$. We already know $d$ (a.k.a the probability density of demand) and we know that our objective is 95% (a.k.a. $\alpha$); we don't want the CDF we want the quantile function.
 
 $$
 F_{d}(z) = \alpha \rightarrow F_{d}^{-1} (\alpha) = z 
@@ -527,34 +533,24 @@ $$
 F_{d}^{-1}(\alpha) = \Phi^{-1}(\alpha) = z_{\alpha}
 $$ {#eq-factorServiceLevel}
 
-
-
 ::: {.callout-note appearance="simple"}
-
 $d$ can be computed from historical demand or by a forecast
-
 :::
-
 
 **What about the other term, in** @eq-ss ?:
 
-::: {.callout-warning}
-
+::: callout-warning
 Many probability theory terms coming. Read them, try to understand them. They are confusing. I would give at the end a way of how you can think of them intuitively.
-
 :::
 
+$Z_\alpha$ is just a factor term that will be multiplied by $\sigma_{d_{l}}$, which can be interpreted as the *variability of demand, and lead time*. @eq-ss is telling us that in order to determine the safety stocks we have to account the variability of two random variables $l$ and $d$. To do that we need the product of two random variables collapsing into a quantity that represents the integrated variability of $l$ and $d$. **How to think about it:** $\sigma_{d_{l}}$ is the area of risk of an inventory policy, the factor $Z_{\alpha}$ determines how much risk are we willing to minimize, the more we want to minimize (by increasing $\alpha$, service level), the more safety stocks, BUT, the more inventory costs by the holding costs. Something that you have to get clear is that safety stocks is the tool that help us battle the variability of the demand, making them essential to give an optimal service level.
 
-$Z_\alpha$ is just a factor term that will be multiplied by $\sigma_{d_{l}}$, which can be interpreted as the _variability of demand, and lead time_. @eq-ss is telling us that in order to determine the safety stocks we have to account the variability of two random variables $l$ and $d$. To do that we need the product of two random variables collapsing into a quantity that represents the integrated variability of $l$ and $d$. **How to think about it:** $\sigma_{d_{l}}$ is the area of risk of an inventory policy, the fator $Z_{\alpha}$ determines how much risk are we willing to minimize, the more we want to minimize (by increasing $\alpha$, service level), the more safety stocks, BUT, the more inventory costs holding costs. Something that you have to get clear is that safety stocks is the tool that help us battle the variability of the demand, making them essential to give an optimal service level.
-
-::: {.callout-note}
-
+::: callout-note
 ## Getting more precise
 
-I am not referring to joint PDF, instead I am referring to a product two random variables which does not create any new distribution, it just describes an area behind the intersection between this two random variables, $l$ and $d$, which accounts their variability, which would be multiplied by $Z_\alpha$ factor to make sure we are $\alpha$ secure of the computation of the safety stocks. If you want to know more about this derivation, search for "product of Gaussians" or "product of random variables".
+With $\sigma_{d_{l}}$ I am not referring to joint PDF, instead I am referring to a product two random variables (in this case $\sigma_{d}$ and $\sigma_{l}$) which does not create any new distribution, it just describes an area behind the intersection between this two random variables, $l$ and $d$, which accounts their variability, which would be multiplied by $Z_\alpha$ factor to make sure we are $\alpha$ secure of the computation of the safety stocks. If you want to know more about this derivation, search for "product of Gaussians" or "product of random variables".
 
-I write this note because at the beginning I was confused between the difference of a joint PDF, a sum of random variables (convolution) and the product of random variables. 
-
+I write this note because at the beginning I was confused between the difference of a joint PDF, a sum of random variables (convolution) and the product of random variables.
 :::
 
 ### Integrating the (S, R) policy
@@ -563,9 +559,7 @@ The derivation of $\sigma_{d_{l}}$ depends on the inventory policy. The $(S, R)$
 
 $$
 S_{s} = Z_{\alpha}\sigma_{l_{d}} = Z_{\alpha} \sqrt{(\mu_{l} + R)\sigma_{d}^{2} + \sigma_{l}^{2}\mu_{d}^{2}}
-$${#eq-ssSR}
-
-
+$$ {#eq-ssSR}
 
 # Dr.House brewery (S, R) stochastic policy simulation
 
@@ -577,7 +571,7 @@ Dr.House brewery wants to simulate its daily **net inventory**:
 
 $$
 net\ inventory = on\ hand\ inventory\ + in\ transit\ inventory\ - backorders 
-$${#eq-net}
+$$ {#eq-net}
 
 But before starting they made some research and obtained the below parameters shown in the table. Notice the choice of using a service level, $\alpha$, of 95% (remember the importance of $\alpha$ for calculating safety stocks @eq-ss).
 
@@ -652,11 +646,11 @@ gt_table
 
 ## 2) Estimating S and R
 
-In order to make the simulation we have to compute the $R$ (review period) and $S$ (order up-to level). In $(S, R)$ policy $S$ depend on $R$ given that to compute $S$ you need to compute $S_s$ (safety stocks) which depends on $R$ given @eq-ssSR. 
+In order to make the simulation we have to compute the $R$ (review period) and $S$ (order up-to level). In $(S, R)$ policy $S$ depend on $R$ given that to compute $S$ you need to compute $S_s$ (safety stocks) which depends on $R$ given @eq-ssSR.
 
 $$
 R = \frac{Q^{*}}{D} = \sqrt{\frac{2{k}}{hD}}
-$${#eq-R}
+$$ {#eq-R}
 
 Last equation @eq-R was obtained with @eq-qstar. Next step is compute $Z_{\alpha}$ (service factor) by computing the quantile function of an standardize normal distribution,$\Phi^{-1}(\alpha)$ (remember the relation of @eq-alpha).
 
@@ -670,7 +664,7 @@ $$
 S_{s} = Z_{\alpha}\sigma_{l_{d}} = Z_{\alpha} \sqrt{(\mu_{l} + R)\sigma_{d}^{2} + \sigma_{l}^{2}\mu_{d}^{2}}
 $$
 
-As last step from this part we compute $S$:
+As a last step from this part we compute $S$:
 
 $$
 S = d_{l} + d_{R} + S_{s} = \mu_{l}R + \mu_{d} + S_{s}
@@ -692,11 +686,9 @@ S <- (l_mu + r_period) * d_mu + ss
 
 ```
 
-
 ## 3) Initialize vectors
 
 We are going to run a for-loop like the one that produced @fig-plot1 but much more complex. As describe we want to simulate the net inventory, shown in @eq-net. But first let's breaking down into parts and look at the code --- it will make sense in the next section.
-
 
 ```{r}
 #| label: Vectors
@@ -725,18 +717,18 @@ backorders_prev <- 0
 
 ### A word about in-transit/on-order inventory
 
-In-transit inventory, for the purposes of this simulation, works as a calendar that will keep track how many days has been since an order was made. More formally it is a calendar-based matrix of future scheduled arrivals. This is what makes the model to have *memory* about the lead-time variability.
+In-transit inventory, for the purposes of this simulation, works as a calendar that will keep track how many days has been since an order was made. More formally it is a calendar-based matrix of future scheduled arrivals. This is what makes the model to have *memory* about the lead-time variability, $\sigma_{l}$.
 
 ## 4) For-loop simulation
 
 Let's start with the **friendly** explication of the simulation:
 
-Every loop is a day (`for (day in 1:n_days){}`). An inventory-day is divided in three: 
+Every loop is a day (`for (day in 1:n_days){}`). An inventory-day is divided in three:
 
-+ **Mornings**:
-  + In the morning we check whether there is any arrival from our suppliers `arrival_qty <- in_transit[day, "quantity"]`
-  + Also we check if we have any back-order `backorders_prev > 0`. If we do, `backorders_prev > 0 = TRUE`, then that means we haven't had any on-hand inventory, which means that the only way to fulfill a back-order is if there is any arrival from the in-transit suppliers `arrival_qty > 0`. If `arrival_qty > 0 = TRUE` then we check if the inventory is enough to fulfill all back-orders(the condition is `arrival_qty >= backorders_prev`), if not then you just subtract the remaining back-orders with the previous ones. The code for all the morning part is down below.
-  
+-   **Mornings**:
+    -   In the morning we check whether there is any arrival from our suppliers `arrival_qty <- in_transit[day, "quantity"]`
+    -   Also we check if we have any back-order `backorders_prev > 0`. If we do, `backorders_prev > 0 = TRUE`, then that means we haven't had any on-hand inventory, which means that the only way to fulfill a back-order is if there is any arrival from the in-transit suppliers `arrival_qty > 0`. If `arrival_qty > 0 = TRUE` then we check if the inventory is enough to fulfill all back-orders (the condition is `arrival_qty >= backorders_prev`), if not then you just subtract the remaining back-orders with the previous ones. The code for all the morning part is down below.
+
 ```{r}
 #| label: Morning-loop-part
 #| execute: FALSE
@@ -770,8 +762,8 @@ for (day in 1:n_days) {
 
 ```
 
-+ During the day.
-  + We first ask us *"Can we satisfy the today's demand given our on-hand inventory?* with the condition `on_hand_cur >= d[day]`.
+-   During the day.
+    -   We first ask us *"Can we satisfy the today's demand given our on-hand inventory?* with the condition `on_hand_cur >= d[day]`.
 
 ```{r}
 #| label: Day-loop-part
@@ -796,10 +788,10 @@ for (day in 1:n_days) {
   #>....Next part, end of the day
 ```
 
-+ Nights.
-  + We keep track of in-transit inventory --- aside from the daily routine, `on_hand_cur >= d[day]` condition is a safeguard for the last day of the simulation. It prevents an error and ensures that once the model time-period is over, the model stops looking for future arrivals from the in-transit inventory.
-  + Our Excel with all the daily data has to be updated with the @eq-net (net-inventory is the same as `inventory_position`)
-  + Finally we make a periodic review $R$ if it is review time, `day %% r_period == 0 = TRUE`. If the condition is `TRUE` we have check the order quantity, the lead-time our suppliers, and aproximate the arrival day (trusting in the word our suppliers); we keep track of new order with our in-transit calendar.
+-   Nights.
+    -   We keep track of in-transit inventory --- aside from the daily routine, `on_hand_cur >= d[day]` condition is a safeguard for the last day of the simulation. It prevents an error and ensures that once the model time-period is over, the model stops looking for future arrivals from the in-transit inventory.
+    -   Our Excel with all the daily data has to be updated with the @eq-net (net-inventory is the same as `inventory_position`)
+    -   Finally we make a periodic review $R$ if it is review time, `day %% r_period == 0 = TRUE`. If the condition is `TRUE` we have check the order quantity, the lead-time our suppliers, and approximate the arrival day (trusting in the word our suppliers); we keep track of new order with our in-transit calendar.
 
 ```{r}
 #| label: Night-loop-part
@@ -956,7 +948,7 @@ results|>
 
 ### Learning by playing
 
-Let's simulate again everything but changing $\alpha$ to 50% and increase the variability of the lead-time $\sigma^{2}_{l}$ to 15. 
+Let's simulate again everything but changing $\alpha$ to 50% and increase the variability of the lead-time $\sigma^{2}_{l}$ to 15.
 
 ```{r}
 #| label: fig-plot7
@@ -1098,20 +1090,20 @@ results_2|>
            label = "Reorder", size = 3, angle = 90, vjust = -0.5)
 ```
 
-Wow, compare @fig-plot6 with @fig-plot7. Changing $\alpha$ & $\sigma^{2}_{l}$ really makes the inventory more insecure. I suggest changing the hyperparameters of demand and lead-time, you will see big changes in the behavior of the simulation at the same time, change $\alpha$, you will that while increasing the variability of the model, keeping an $\alpha$ above 90% will really keep your inventory safe.
+Wow, compare @fig-plot6 with @fig-plot7. Changing $\alpha$ & $\sigma^{2}_{l}$ really makes the inventory more insecure. I suggest changing the hyperparameters of demand and lead-time, you will see big changes in the behavior of the simulation; at the same time change $\alpha$, you will notice that while increasing the variability of the model, keeping an $\alpha$ above 90% will really keep your inventory mostly safe.
 
 ## Sad reality
 
-There's something sad around this last simulation. It also has assumptions that hurts the accuracy. Assumptions:
+There's something sad around this last simulation. It also has assumptions that hurts its accuracy. Assumptions:
 
-- Normality. Demand nor lead-time aren't normal. They are descrite variables.
-- Independence. We are assuming that demand and lead-time are independent of each other this can be untrue, we have to check their correlation.
-- Stationary. Demand has high autocorrelation, therefore it does not behave like in @fig-plot8.
-- Different orders can cross each other.
+-   Normality. Demand nor lead-time aren't normal. They are discrete variables.
+-   Independence. We are assuming that demand and lead-time are independent of each other, this can be untrue, we have to check their correlation.
+-   Stationary. Demand has high autocorrelation, therefore it does not behave like in @fig-plot8.
+-   Different orders can cross each other.
 
 ```{r}
 #| label: fig-plot8
-#| fig-cap: "This kind of behavior isn't real. There is high autocorrelation "
+#| fig-cap: "This kind of behavior isn't real. There is high autocorrelation. "
 
 
 plot8 <- results |> 
@@ -1126,15 +1118,12 @@ plot8 <- results |>
 plot8
 ```
 
-All of these makes the stochastic model with room for improvement --- but not for this model.
+All of these makes the stochastic model with room for improvement --- but not today.
 
 # Reflection
 
-Making an inventory simulation isn't as easy as someone would had thinked. Complex supply chains demand us making adjustments to old models, like EOQ model where @eq-qstar was derived. This seems to be part of an ever changing world that after the reinascance the rate of change has increased dramatically. However, this old simplistic models do help us makes sense the phenoma we are trying to understand; and this can be applied to all models, not even mathematicals, at the end we live in a world we don't understand. 
+Making an inventory simulation isn't as easy as someone would had think. Complex supply chains demand us making adjustments to old models, like EOQ model where @eq-qstar was derived. This seems to be part of an ever changing world that after the Renascence the rate of change has increased dramatically. However, this old simplistic models do help us makes sense the phenomena we are trying to understand; and this can be applied to all models, not even mathematical ones, at the end we live in a world we don't understand.
 
 ## P.D.
 
-I thougt this article would take me 2 days to finish. It took me 5. I am quite exhausted. I just love doing some math, and trying to make sense of the world and do crazy stuff. Anyone who came all the way to here, I hope you liked it; I know math can be hard, but it really is usefull, and congrats if you made the effort, go right now to celebrate with your love ones. Cheers. 
-
-
-
+I thought this article would take me 2 days to finish. It took me 5. I am quite exhausted. I just love doing some math, and trying to make sense of the world and do crazy stuff. Anyone who came all the way to here, I hope you liked it; I know math can be hard, but it really is useful, and congrats if you made the effort, go right now to celebrate with your love ones. Cheers.
