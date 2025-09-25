@@ -91,6 +91,41 @@
     "text": "P.D.\nI thought this article would take me 2 days to finish. It took me 5. I am quite exhausted. I just love doing some math, and trying to make sense of the world and do crazy stuff. Anyone who came all the way to here, I hope you liked it; I know math can be hard, but it really is useful, and congrats if you made the effort, go right now to celebrate with your love ones. Cheers."
   },
   {
+    "objectID": "blog/2025-09-24-bayesian-intuition/index.html",
+    "href": "blog/2025-09-24-bayesian-intuition/index.html",
+    "title": "Bayesian Intuition for Beginners with Interactive Web Applications",
+    "section": "",
+    "text": "My journey into statistics is an unusual case. I got an introduction of the classical test statistics (\\(z, \\space t, \\space tt, \\chi^{2}, etc...\\)) for experimental design class. I liked it a lot but I wasn’t satisfied and later on it felt that I needed a solid background of statistics; YouTube’s algorithm noticed it and showed an incredible video (Lennox 2016) that explains this school of thought of statistics called Bayesianism. It convinced me. The result: I learned Bayesian statistics first and then Frequentists stats.\nRecently I have been going deep into Frequentist approaches of decision making given that it is what must of people know. But, I always get this feeling of insatisfaction, maybe even contempt. Reading a paper by Efron (1986) called “Why Isn’t Everyone a Bayesian?” — great article — inspired me to make my first Bayesian blog about the classical coin flipping scenario seeing form the lens of Bayesianism. It is really intuitive and playing with the web applications will make you have a better understanding. Hope you like it. My objective is to get you into the inverse probability rabbit hole.\nThis for beginners and I won’t be using any math. If you want to know what is going on behind the scenario check Murphy (2023). The web applications for playing are in the extra links section at the right side of your the screen."
+  },
+  {
+    "objectID": "blog/2025-09-24-bayesian-intuition/index.html#setting-up-your-belief",
+    "href": "blog/2025-09-24-bayesian-intuition/index.html#setting-up-your-belief",
+    "title": "Bayesian Intuition for Beginners with Interactive Web Applications",
+    "section": "1) Setting up your belief",
+    "text": "1) Setting up your belief\nYou know it is a dumb game because you know there is 50/50 chance of winning. The is no skill involvement. But okay, you proposed it so you have to play along. You will be betting on heads. Here as a Bayesian we define our beliefs of the probability that it falls heads, which is 50%:\n\n\n\n\n\n\n\n\n\nHere we are saying that you are 100% sure that the probability is 50%. This isn’t true. There is some variation produced from factory in the shape of the coin, or any other reason you can think about. So you define a more accurate belief:\n\n\n\n\n\n\n\n\n\nHere we are saying that we are still pretty sure that the probability is 50%. Imagine that we are really clueless, and we really don’t know. This is how we would represent our belief:\n\n\n\n\n\n\n\n\n\nWhy does this expression translates into cluelessness? By assigning equal probability to everything you are saying that anything can happen, it is an expression of complete uncertainty1\nHow do we modify our beliefs? We use something called probability density functions. The normal distribution is a probability density function. They contain something called hyperparameters that we use, in this case, to modify state our beliefs and modifying it by changing its values. In the next animation it shows how the beta distribution, which is the probability density function we have used in the previous figures, changes when the hyperparameters are modified.\n\n\n\nBeta Distribution Animation\n\n\nNext it’s your turn to modified the hyperparameters and get a sense of how the beta distribution works. Go to the link play at the bottom right side of the screen with the name “Beta Distribution Visualizer”. Play with the app, and think how would YOU define your beliefs over a coin."
+  },
+  {
+    "objectID": "blog/2025-09-24-bayesian-intuition/index.html#updating-your-belief",
+    "href": "blog/2025-09-24-bayesian-intuition/index.html#updating-your-belief",
+    "title": "Bayesian Intuition for Beginners with Interactive Web Applications",
+    "section": "2) Updating your belief",
+    "text": "2) Updating your belief\nThe game is about to start and suddenly a friendly voice says “I bet 100$ on Tails but with my coin”. You know that tone, it is your tricky cheater of a cousin. You know he has some biased coins in his closet. Your belief over the coin changes rapidly:\n\n\n\n\n\n\n\n\n\nYou just think he is going to cheat, and you are assigning smaller probability the coin being fair. The only way to changing our belief is by playing it, because maybe you are wrong and it is really a fair coin by landing 50/50 heads and tails. Let’s play 10 times:\n\n\n\n\n\n\n\n\n\nTurns out your prior belief, which stated he would cheat, isn’t correct. He used a fair coin. I guess sometimes people change."
+  },
+  {
+    "objectID": "blog/2025-09-24-bayesian-intuition/index.html#bayesian-statistics",
+    "href": "blog/2025-09-24-bayesian-intuition/index.html#bayesian-statistics",
+    "title": "Bayesian Intuition for Beginners with Interactive Web Applications",
+    "section": "Bayesian statistics",
+    "text": "Bayesian statistics\nThis is the essence of Bayesian statistics: a method in which we update our beliefs over something given evidence. The updated evidence is what is called the posterior and you can think of it as a compromise between our prior beliefs and the data.\n\\[\nposterior ≈ data \\space * \\space prior\n\\] Please enter to the link at the bottom right side of the screen with the name “Bayesian Coin Toss Simulation” to get a sense how posterior is formed given evidence (data). If you have a very strong belief, it is probable that the prior overwhelms the data, so chose wisely your prior."
+  },
+  {
+    "objectID": "blog/2025-09-24-bayesian-intuition/index.html#footnotes",
+    "href": "blog/2025-09-24-bayesian-intuition/index.html#footnotes",
+    "title": "Bayesian Intuition for Beginners with Interactive Web Applications",
+    "section": "Footnotes",
+    "text": "Footnotes\n\n\nThere is better ways to express cluelessness in Bayesian statistics. This non-informative uniform prior is saying something at the end by assigning equal probabilities to anything. That’s something! There is others non-informative priors that really try not saying something, like Jeffreys prior. More info about noninformative priors in Murphy (2023)↩︎"
+  },
+  {
     "objectID": "about.html",
     "href": "about.html",
     "title": "About",
@@ -151,6 +186,6 @@
     "href": "blog/index.html",
     "title": "Blog",
     "section": "",
-    "text": "Stochastic Inventory Modelling: A Tutorial for Dummies using R\n\n\n\n\n\nSep 9, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nConnection Between Naïve Bayes and Logistic Regression\n\n\n\n\n\nAug 26, 2025\n\n\n\n\n\nNo matching items"
+    "text": "Bayesian Intuition for Beginners with Interactive Web Applications\n\n\n\n\n\nSep 25, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nStochastic Inventory Modelling: A Tutorial for Dummies using R\n\n\n\n\n\nSep 9, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nConnection Between Naïve Bayes and Logistic Regression\n\n\n\n\n\nAug 26, 2025\n\n\n\n\n\nNo matching items"
   }
 ]
