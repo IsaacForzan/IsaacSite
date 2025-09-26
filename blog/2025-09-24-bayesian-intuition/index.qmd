@@ -44,9 +44,9 @@ library(rmarkdown)
 
 My journey into statistics is an unusual case. I got an introduction of the classical test statistics ($z, \space t, \space tt, \chi^{2}, etc...$) for experimental design class. I liked it a lot but I wasn't satisfied and later on it felt that I needed a solid background of statistics; YouTube's algorithm noticed it and showed an incredible video [@lenox2016] that explains this school of thought of statistics called Bayesianism. It convinced me. The result: I learned Bayesian statistics first and then Frequentists stats.
 
-Recently I have been going deep into Frequentist approaches of decision making given that it is what must of people know. But, I always get this feeling of insatisfaction, maybe even contempt. Reading a paper by @efron1986why called "*Why Isn't Everyone a Bayesian?*" --- great article --- inspired me to make my first Bayesian blog about the classical coin flipping scenario seeing form the lens of Bayesianism. It is really intuitive and playing with the web applications will make you have a better understanding. Hope you like it. My objective is to get you into the *inverse probability* rabbit hole.
+Recently I have been going deep into Frequentist approaches of decision making given that it is what must people know. But, I always get this feeling of insatisfaction, maybe even contempt. Reading a paper by @efron1986why called "*Why Isn't Everyone a Bayesian?*" --- great article --- inspired me to make my first Bayesian blog about the classical coin flipping scenario seeing from the lens of Bayesianism. It is really intuitive and playing with the web applications will make you have a better understanding. Hope you like it. My objective is to get you into the *inverse probability* rabbit hole.
 
-This for beginners and **I** **won't be using any math**. If you want to know what is going on behind the scenario check @pml2Book. The web applications for playing are in the extra links section at the right side of your the screen.
+This is for beginners and **I** **won't be using any math**. If you want to know what is going on behind the scenario check @pml2Book. The web applications for playing are in the extra links section at the right side of your the screen.
 
 # Coin flipping
 
@@ -100,7 +100,7 @@ tibble(
   geom_area(fill = "lightblue", alpha = 0.5) +  # More transparent
   geom_line(color = "blue", linewidth = 1) +
   labs(
-    title = "Our Beliefs of the probability of the coin falling into heads",
+    title = "Our Beliefs of the probability of the coin landing on heads",
     x = "Heads",
     y = "Probability Density"
   ) + theme_bw()
@@ -108,9 +108,9 @@ tibble(
 
 Why does this expression translates into cluelessness? By assigning equal probability to everything you are saying that anything can happen, it is an expression of complete uncertainty[^1]
 
-[^1]: There is better ways to express cluelessness in Bayesian statistics. This non-informative uniform prior is saying something at the end by assigning equal probabilities to anything. That's something! There is others non-informative priors that really try not saying something, like Jeffreys prior. More info about noninformative priors in @pml2Book
+[^1]: There are better ways to express cluelessness in Bayesian statistics. This non-informative uniform prior is saying something at the end by assigning equal probabilities to anything. That's something! There is others non-informative priors that really try not to say something, like Jeffreys prior. More info about noninformative priors in @pml2Book
 
-How do we modify our beliefs? We use something called probability density functions. The normal distribution is a probability density function. They contain something called hyperparameters that we use, in this case, to modify state our beliefs and modifying it by changing its values. In the next animation it shows how the beta distribution, which is the probability density function we have used in the previous figures, changes when the hyperparameters are modified.
+How do we modify our beliefs? We use something called probability density functions. The normal distribution is a probability density function. They contain something called hyperparameters that we use, in this case, to modify the state of our beliefs by changing its values. The next animation showz how the beta distribution, which is the probability density function we have used in the previous figures, changes when the hyperparameters are modified.
 
 ![Beta Distribution Animation](beta_animation.gif)
 
@@ -135,7 +135,7 @@ tibble(
   ) + theme_bw()
 ```
 
-You just think he is going to cheat, and you are assigning smaller probability the coin being fair. The only way to changing our belief is by playing it, because maybe you are wrong and it is really a fair coin by landing 50/50 heads and tails. Let's play 10 times:
+You just think he is going to cheat, and you are assigning a smaller probability of the coin been fair. The only way to change our belief is by playing, because maybe you are wrong and it is really a fair coin by landing 50/50 heads and tails. Let's play 10 times:
 
 ```{r}
 params <- list(
@@ -197,8 +197,10 @@ This is the essence of Bayesian statistics: a method in which we update our beli
 
 $$
 posterior ≈ data \space * \space prior
-$$ Please enter to the link at the bottom right side of the screen with the name "**Bayesian Coin Toss Simulation**" to get a sense how posterior is formed given evidence (data). If you have a very strong belief, it is probable that the prior overwhelms the data, so chose wisely your prior.
+$$
+
+Please enter to the link at the bottom right side of the screen with the name "**Bayesian Coin Toss Simulation**" to get a sense how posterior is formed given evidence (data). If you have a very strong belief, it is probable that the prior overwhelms the data, so chose wisely your prior.
 
 # Further readings
 
-This is just the begging of the Bayesian paradigm. And I hope you like it. If you really like it I and you are a true beginner I recommend @kruschke2015doing (I left the link for the .pdf), the author explains every single topic exquisitely, and it is all about doing data analysis for the frequent practitioner, if you are not really into math, this is the book. If you want something more rigorous, more for statistician @gelman2013bayesian is the bible for Bayesians (in the url page you can downloaded for free). If you are interested and don't know where to start, don't hesitate in contact me.
+This is just the begging of the Bayesian paradigm. And I hope you like it. If you really like it and you are a true beginner I recommend @kruschke2015doing (I left the link for the .pdf), the author explains every single topic exquisitely, and it is all about doing data analysis for the frequent practitioner, if you are not really into math, this is the book. If you want something more rigorous, more for statisticians @gelman2013bayesian is the bible for Bayesians (in the url page you can downloaded for free). If you are interested and don't know where to start, don't hesitate in contact me.

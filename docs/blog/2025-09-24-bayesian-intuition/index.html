@@ -214,8 +214,8 @@ window.Quarto = {
 <section id="introduction" class="level1">
 <h1>Introduction</h1>
 <p>My journey into statistics is an unusual case. I got an introduction of the classical test statistics (<span class="math inline">\(z, \space t, \space tt, \chi^{2}, etc...\)</span>) for experimental design class. I liked it a lot but I wasn’t satisfied and later on it felt that I needed a solid background of statistics; YouTube’s algorithm noticed it and showed an incredible video <span class="citation" data-cites="lenox2016">(<a href="#ref-lenox2016" role="doc-biblioref">Lennox 2016</a>)</span> that explains this school of thought of statistics called Bayesianism. It convinced me. The result: I learned Bayesian statistics first and then Frequentists stats.</p>
-<p>Recently I have been going deep into Frequentist approaches of decision making given that it is what must of people know. But, I always get this feeling of insatisfaction, maybe even contempt. Reading a paper by <span class="citation" data-cites="efron1986why">Efron (<a href="#ref-efron1986why" role="doc-biblioref">1986</a>)</span> called “<em>Why Isn’t Everyone a Bayesian?</em>” — great article — inspired me to make my first Bayesian blog about the classical coin flipping scenario seeing form the lens of Bayesianism. It is really intuitive and playing with the web applications will make you have a better understanding. Hope you like it. My objective is to get you into the <em>inverse probability</em> rabbit hole.</p>
-<p>This for beginners and <strong>I</strong> <strong>won’t be using any math</strong>. If you want to know what is going on behind the scenario check <span class="citation" data-cites="pml2Book">Murphy (<a href="#ref-pml2Book" role="doc-biblioref">2023</a>)</span>. The web applications for playing are in the extra links section at the right side of your the screen.</p>
+<p>Recently I have been going deep into Frequentist approaches of decision making given that it is what must people know. But, I always get this feeling of insatisfaction, maybe even contempt. Reading a paper by <span class="citation" data-cites="efron1986why">Efron (<a href="#ref-efron1986why" role="doc-biblioref">1986</a>)</span> called “<em>Why Isn’t Everyone a Bayesian?</em>” — great article — inspired me to make my first Bayesian blog about the classical coin flipping scenario seeing from the lens of Bayesianism. It is really intuitive and playing with the web applications will make you have a better understanding. Hope you like it. My objective is to get you into the <em>inverse probability</em> rabbit hole.</p>
+<p>This is for beginners and <strong>I</strong> <strong>won’t be using any math</strong>. If you want to know what is going on behind the scenario check <span class="citation" data-cites="pml2Book">Murphy (<a href="#ref-pml2Book" role="doc-biblioref">2023</a>)</span>. The web applications for playing are in the extra links section at the right side of your the screen.</p>
 </section>
 <section id="coin-flipping" class="level1">
 <h1>Coin flipping</h1>
@@ -253,7 +253,7 @@ window.Quarto = {
 </div>
 </div>
 <p>Why does this expression translates into cluelessness? By assigning equal probability to everything you are saying that anything can happen, it is an expression of complete uncertainty<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
-<p>How do we modify our beliefs? We use something called probability density functions. The normal distribution is a probability density function. They contain something called hyperparameters that we use, in this case, to modify state our beliefs and modifying it by changing its values. In the next animation it shows how the beta distribution, which is the probability density function we have used in the previous figures, changes when the hyperparameters are modified.</p>
+<p>How do we modify our beliefs? We use something called probability density functions. The normal distribution is a probability density function. They contain something called hyperparameters that we use, in this case, to modify the state of our beliefs by changing its values. The next animation showz how the beta distribution, which is the probability density function we have used in the previous figures, changes when the hyperparameters are modified.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="beta_animation.gif" class="img-fluid figure-img"></p>
@@ -274,7 +274,7 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<p>You just think he is going to cheat, and you are assigning smaller probability the coin being fair. The only way to changing our belief is by playing it, because maybe you are wrong and it is really a fair coin by landing 50/50 heads and tails. Let’s play 10 times:</p>
+<p>You just think he is going to cheat, and you are assigning a smaller probability of the coin been fair. The only way to change our belief is by playing, because maybe you are wrong and it is really a fair coin by landing 50/50 heads and tails. Let’s play 10 times:</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -291,12 +291,13 @@ window.Quarto = {
 <p>This is the essence of Bayesian statistics: a method in which we update our beliefs over something given evidence. The updated evidence is what is called the <strong>posterior</strong> and you can think of it as a compromise between our prior beliefs and the data.</p>
 <p><span class="math display">\[
 posterior ≈ data \space * \space prior
-\]</span> Please enter to the link at the bottom right side of the screen with the name “<strong>Bayesian Coin Toss Simulation</strong>” to get a sense how posterior is formed given evidence (data). If you have a very strong belief, it is probable that the prior overwhelms the data, so chose wisely your prior.</p>
+\]</span></p>
+<p>Please enter to the link at the bottom right side of the screen with the name “<strong>Bayesian Coin Toss Simulation</strong>” to get a sense how posterior is formed given evidence (data). If you have a very strong belief, it is probable that the prior overwhelms the data, so chose wisely your prior.</p>
 </section>
 </section>
 <section id="further-readings" class="level1">
 <h1>Further readings</h1>
-<p>This is just the begging of the Bayesian paradigm. And I hope you like it. If you really like it I and you are a true beginner I recommend <span class="citation" data-cites="kruschke2015doing">Kruschke (<a href="#ref-kruschke2015doing" role="doc-biblioref">2015</a>)</span> (I left the link for the .pdf), the author explains every single topic exquisitely, and it is all about doing data analysis for the frequent practitioner, if you are not really into math, this is the book. If you want something more rigorous, more for statistician <span class="citation" data-cites="gelman2013bayesian">Gelman et al. (<a href="#ref-gelman2013bayesian" role="doc-biblioref">2013</a>)</span> is the bible for Bayesians (in the url page you can downloaded for free). If you are interested and don’t know where to start, don’t hesitate in contact me.</p>
+<p>This is just the begging of the Bayesian paradigm. And I hope you like it. If you really like it and you are a true beginner I recommend <span class="citation" data-cites="kruschke2015doing">Kruschke (<a href="#ref-kruschke2015doing" role="doc-biblioref">2015</a>)</span> (I left the link for the .pdf), the author explains every single topic exquisitely, and it is all about doing data analysis for the frequent practitioner, if you are not really into math, this is the book. If you want something more rigorous, more for statisticians <span class="citation" data-cites="gelman2013bayesian">Gelman et al. (<a href="#ref-gelman2013bayesian" role="doc-biblioref">2013</a>)</span> is the bible for Bayesians (in the url page you can downloaded for free). If you are interested and don’t know where to start, don’t hesitate in contact me.</p>
 
 
 
@@ -322,7 +323,7 @@ Murphy, Kevin P. 2023. <em>Probabilistic Machine Learning: Advanced Topics</em>.
 </div></section><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
 
 <ol>
-<li id="fn1"><p>There is better ways to express cluelessness in Bayesian statistics. This non-informative uniform prior is saying something at the end by assigning equal probabilities to anything. That’s something! There is others non-informative priors that really try not saying something, like Jeffreys prior. More info about noninformative priors in <span class="citation" data-cites="pml2Book">Murphy (<a href="#ref-pml2Book" role="doc-biblioref">2023</a>)</span><a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1"><p>There are better ways to express cluelessness in Bayesian statistics. This non-informative uniform prior is saying something at the end by assigning equal probabilities to anything. That’s something! There is others non-informative priors that really try not to say something, like Jeffreys prior. More info about noninformative priors in <span class="citation" data-cites="pml2Book">Murphy (<a href="#ref-pml2Book" role="doc-biblioref">2023</a>)</span><a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
